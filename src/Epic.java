@@ -1,19 +1,25 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Epic extends Task{
-    private ArrayList<Subtask> subtasks;
+public class Epic extends Task {
+    private ArrayList<Integer> subtasksIds;
 
-    public ArrayList<Subtask> getSubtasks() {
-        return subtasks;
-    }
-
-    public void setSubtasks(ArrayList<Subtask> subtasks) {
-        this.subtasks = subtasks;
-    }
-
-    public Epic(String title, String description, int id, Status status, ArrayList<Subtask> subtasks) {
+    public Epic(String title, String description, int id, Status status, ArrayList<Integer> subtasksIds) {
         super(title, description, id, status);
-        this.subtasks = subtasks;
+        this.subtasksIds = subtasksIds;
+    }
+
+    public boolean removeSubtask(int id) {
+        if (!this.subtasksIds.contains(id))
+            return false;
+        int index = this.subtasksIds.indexOf(id);
+        this.subtasksIds.remove(index);
+        return true;
+
+    }
+
+    public void clearAllSubtasks()
+    {
+        this.subtasksIds.clear();
     }
 }
