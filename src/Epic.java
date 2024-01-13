@@ -1,0 +1,18 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Epic extends Task{
+    private ArrayList<Subtask> subtasks;
+    public Epic(String title, String description, int id, Status status, ArrayList<Subtask> subtasks) {
+        super(title, description, id, status);
+        this.subtasks = subtasks;
+    }
+
+
+
+
+    public Epic(String title, String description, int id, Status status) {
+        super(title, description, id, status);
+    }
+
+}
