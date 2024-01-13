@@ -3,40 +3,34 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner scanner;
+
     public static void main(String[] args) {
         scanner = new Scanner(System.in);
         System.out.println("Поехали!");
         while (true) {
-            TaskMenu.printMenu();
+            printMainMenu();
             String command = scanner.nextLine();
-
             switch (command) {
                 case "1":
-                    TaskMenu.addTask();
+                    TaskMenu.showTaskMenu();
                     break;
                 case "2":
-                    TaskMenu.showAllTasks();
                     break;
                 case "3":
-                    TaskMenu.clearAllTasks();
                     break;
                 case "4":
-                    TaskMenu.getTaskById();
-                    break;
-                case "5":
-                    TaskMenu.updateTask();
-                    break;
-                case "6":
-                    TaskMenu.deleteTask();
-                    break;
-                case "7":
-                    TaskMenu.changeTaskStatus();
-                    break;
-                case "8":
                     return;
             }
         }
 
+    }
+
+    public static void printMainMenu() {
+        System.out.println("Выберите команду:");
+        System.out.println("1 - Работа с задачами");
+        System.out.println("2 - Работа с эпиками");
+        System.out.println("3 - Работа с подзадачами");
+        System.out.println("4 - Выход");
     }
 
 

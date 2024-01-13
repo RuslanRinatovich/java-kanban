@@ -2,6 +2,39 @@ import java.util.Scanner;
 
 public class TaskMenu {
     static Scanner scanner = new Scanner(System.in);
+
+    public static void showTaskMenu()
+    {
+        while (true) {
+            printMenu();
+            String command = scanner.nextLine();
+            switch (command) {
+                case "1":
+                    addTask();
+                    break;
+                case "2":
+                    showAllTasks();
+                    break;
+                case "3":
+                    clearAllTasks();
+                    break;
+                case "4":
+                    getTaskById();
+                    break;
+                case "5":
+                    updateTask();
+                    break;
+                case "6":
+                    deleteTask();
+                    break;
+                case "7":
+                    changeTaskStatus();
+                    break;
+                case "8":
+                    return;
+            }
+        }
+    }
     public static void printMenu() {
         System.out.println("Выберите команду:");
         System.out.println("1 - Создать новую задачу");
