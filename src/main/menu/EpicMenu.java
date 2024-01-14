@@ -4,6 +4,7 @@ import main.models.Epic;
 import main.models.Status;
 import main.models.Subtask;
 import main.TaskManager;
+import main.Main;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -58,8 +59,8 @@ public class EpicMenu {
         System.out.println("Введите описание эпика:");
         String description = scanner.nextLine();
         ArrayList<Integer> subtasksIds =  new ArrayList<>();
-        Epic newEpic = new Epic(title, description, TaskManager.getNewEpiсId(), Status.NEW, subtasksIds);
-        TaskManager.addEpic(newEpic);
+        Epic newEpic = new Epic(title, description, 0, Status.NEW, subtasksIds);
+        Main.taskManager.addEpic(newEpic);
         System.out.println("Новый эпик добавлен");
     }
 
@@ -67,7 +68,7 @@ public class EpicMenu {
     public static void showAllEpics() {
         System.out.println("Список всех эпиков");
         System.out.println("--------------------------");
-        for (Epic t : TaskManager.getAllEpics()) {
+        for (Epic t : Main.taskManager.getAllEpics()) {
             System.out.println(t);
 
             if (t.getSubtasksIds().isEmpty())
@@ -76,7 +77,7 @@ public class EpicMenu {
             } else {
                 System.out.println("---Подзадачи");
                 for (int i: t.getSubtasksIds()) {
-                    Subtask subtask = TaskManager.getSubtaskById(i);
+                    Subtask subtask = Main.taskManager.getSubtaskById(i);
                     System.out.println("\t" + subtask);
                 }
                 System.out.println("----------");
@@ -91,7 +92,7 @@ public class EpicMenu {
         System.out.println("Вы действительно хотите очистить список эпиков с подзадачами'? Y/N");
         String answer = scanner.nextLine();
         if (answer.equals("Y") || answer.equals("y")) {
-            TaskManager.deleteAllEpics();
+            Main.taskManager.deleteAllEpics();
             System.out.println("Cписок эпиков очищен");
         } else {
             System.out.println("Очистка прервана");
@@ -103,7 +104,7 @@ public class EpicMenu {
         System.out.println("Введите идентификатор эпика");
         int id = scanner.nextInt();
         scanner.nextLine();
-        Epic t = TaskManager.getEpicById(id);
+        Epic t = Main.taskManager.getEpicById(id);
         if (t != null) {
             System.out.println(t);
             if (t.getSubtasksIds().isEmpty())
@@ -112,7 +113,7 @@ public class EpicMenu {
             } else {
                 System.out.println("---Подзадачи");
                 for (int i: t.getSubtasksIds()) {
-                    Subtask subtask = TaskManager.getSubtaskById(i);
+                    Subtask subtask = Main.taskManager.getSubtaskById(i);
                     System.out.println("\t" + subtask);
                 }
                 System.out.println("----------");
@@ -127,14 +128,14 @@ public class EpicMenu {
         System.out.println("Введите идентификатор эпика:");
         int id = scanner.nextInt();
         scanner.nextLine();
-        Epic t = TaskManager.getEpicById(id);
+        Epic t = Main.taskManager.getEpicById(id);
         if (t != null) {
             System.out.println("Введите название эпика:");
             String title = scanner.nextLine();
             System.out.println("Введите описание эпика:");
             String description = scanner.nextLine();
-            t.setTitle(title);
-            t.setDescription(description);
+            Epic newEpic = new Epic(title, description, t.getId(), t.getStatus(), t.getSubtasksIds());
+            Main.taskManager.updateEpic(newEpic);
             System.out.println("Эпик обновлен");
         } else {
             System.out.println("Ошибка, не верный идентификатор");
@@ -146,9 +147,9 @@ public class EpicMenu {
     public static void deleteEpic() {
         System.out.println("Введите идентификатор эпика");
         int id = scanner.nextInt();
-        Epic t = TaskManager.getEpicById(id);
+        Epic t = Main.taskManager.getEpicById(id);
         if (t != null) {
-            TaskManager.deleteEpic(id);
+            Main.taskManager.deleteEpic(id);
             System.out.println("Эпик удален");
         } else {
             System.out.println("Ошибка, не верный идентификатор");

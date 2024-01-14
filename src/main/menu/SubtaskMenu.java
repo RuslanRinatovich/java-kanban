@@ -4,6 +4,7 @@ import main.models.Epic;
 import main.models.Status;
 import main.models.Subtask;
 import main.TaskManager;
+import main.Main;
 
 import java.util.Scanner;
 
@@ -64,9 +65,9 @@ public class SubtaskMenu {
         System.out.println("Введите идентификатор эпика:");
         int id = scanner.nextInt();
         scanner.nextLine();
-        if (TaskManager.epicHashMap.containsKey(id)) {
-            Subtask newSubtask = new Subtask(title, description, TaskManager.getNewSubtaskId(), Status.NEW, id);
-            TaskManager.addSubtask(newSubtask);
+        if (Main.taskManager.epicHashMap.containsKey(id)) {
+            Subtask newSubtask = new Subtask(title, description, 0, Status.NEW, id);
+            Main.taskManager.addSubtask(newSubtask);
         } else {
             System.out.println("Ошибка. Неправильный идентификатор эпика");
         }
@@ -76,8 +77,8 @@ public class SubtaskMenu {
     public static void showAllSubtasks() {
         System.out.println("Список всех подзадач");
         System.out.println("--------------------------");
-        for (Subtask t : TaskManager.getAllSubtasks()) {
-            Epic epic = TaskManager.getEpicById(t.getEpicId());
+        for (Subtask t : Main.taskManager.getAllSubtasks()) {
+            Epic epic = Main.taskManager.getEpicById(t.getEpicId());
             System.out.println("Эпик: " + epic.getTitle() + "\n" + t);
         }
         System.out.println("--------------------------");
@@ -89,7 +90,7 @@ public class SubtaskMenu {
         System.out.println("Вы действительно хотите очистить список подзадач? Y/N");
         String answer = scanner.nextLine();
         if (answer.equals("Y") || answer.equals("y")) {
-            TaskManager.deleteAllSubtasks();
+            Main.taskManager.deleteAllSubtasks();
             System.out.println("Cписок подзадач очищен");
         } else {
             System.out.println("Очистка прервана");
@@ -101,9 +102,9 @@ public class SubtaskMenu {
         System.out.println("Введите идентификатор подзадачи");
         int id = scanner.nextInt();
         scanner.nextLine();
-        Subtask t = TaskManager.getSubtaskById(id);
+        Subtask t = Main.taskManager.getSubtaskById(id);
         if (t != null) {
-            Epic epic = TaskManager.getEpicById(t.getEpicId());
+            Epic epic = Main.taskManager.getEpicById(t.getEpicId());
             System.out.println("Эпик: " + epic.getTitle());
             System.out.println(t);
         } else {
@@ -116,7 +117,7 @@ public class SubtaskMenu {
         System.out.println("Введите идентификатор подзадачи:");
         int id = scanner.nextInt();
         scanner.nextLine();
-        Subtask t = TaskManager.getSubtaskById(id);
+        Subtask t = Main.taskManager.getSubtaskById(id);
         if (t != null) {
             System.out.println("Введите название подзадачи:");
             String title = scanner.nextLine();
@@ -146,15 +147,18 @@ public class SubtaskMenu {
             System.out.println("Введите идентификатор эпика:");
             int epicId = scanner.nextInt();
             scanner.nextLine();
-            Epic epic = TaskManager.getEpicById(id);
+            Epic epic = Main.taskManager.getEpicById(id);
             if (epic != null) {
-                TaskManager.deleteSubtask(t.getId());
-                Subtask newTask = new Subtask(title, description, id, status, epicId);
-                TaskManager.updateSubtask(newTask);
-                System.out.println("Подзадача обновлена");
+                Epic oldEpic = Main.taskManager.getEpicById(t.getId());
+                if (epic.getId() != oldEpic.getId())
+                {
+                    Main.taskManager.removeSubtask(oldEpic, id);
+                }
+                    Subtask newTask = new Subtask(title, description, id, status, epicId);
+                    Main.taskManager.updateSubtask(newTask);
+                    System.out.println("Подзадача обновлена");
             } else {
                 System.out.println("Ошибка, не верный идентификатор эпика");
-                return;
             }
         } else {
             System.out.println("Ошибка, не верный идентификатор");
@@ -166,9 +170,9 @@ public class SubtaskMenu {
     public static void deleteSubtask() {
         System.out.println("Введите идентификатор подзадачи");
         int id = scanner.nextInt();
-        Subtask t = TaskManager.getSubtaskById(id);
+        Subtask t = Main.taskManager.getSubtaskById(id);
         if (t != null) {
-            TaskManager.deleteSubtask(id);
+            Main.taskManager.deleteSubtask(id);
             System.out.println("Подзадача удалена");
         } else {
             System.out.println("Ошибка, не верный идентификатор");
@@ -179,7 +183,7 @@ public class SubtaskMenu {
     public static void changeSubtaskStatus() {
         System.out.println("Введите идентификатор подзадачи");
         int id = scanner.nextInt();
-        Subtask t = TaskManager.getSubtaskById(id);
+        Subtask t = Main.taskManager.getSubtaskById(id);
         if (t != null) {
             System.out.println("Введите статус подзадачи:\n1 - NEW,\n" +
                     " 2 - IN_PROGRESS,\n" +
@@ -201,7 +205,7 @@ public class SubtaskMenu {
                     System.out.println("Ошибка, не корректный статус");
                     return;
             }
-            TaskManager.changeSubtaskStatus(t, status);
+            Main.taskManager.changeSubtaskStatus(t, status);
             System.out.println("Статус обновлен");
         } else {
             System.out.println("Ошибка, не верный идентификатор");

@@ -3,28 +3,27 @@ package main.models;
 import java.util.ArrayList;
 
 public class Epic extends Task {
+
+    private ArrayList<Integer> subtasksIds;
+
     public ArrayList<Integer> getSubtasksIds() {
         return subtasksIds;
     }
-
-
-    public void setSubtasksIds(ArrayList<Integer> subtasksIds) {
-        this.subtasksIds = subtasksIds;
-    }
-
-    private ArrayList<Integer> subtasksIds;
 
     public Epic(String title, String description, int id, Status status, ArrayList<Integer> subtasksIds) {
         super(title, description, id, status);
         this.subtasksIds = subtasksIds;
     }
+    public void setSubtasksIds(ArrayList<Integer> subtasksIds) {
+        this.subtasksIds = subtasksIds;
+    }
 
-    public boolean removeSubtask(int id) {
+
+    public void removeSubtask(int id) {
         if (!this.subtasksIds.contains(id))
-            return false;
+            return;
         int index = this.subtasksIds.indexOf(id);
         this.subtasksIds.remove(index);
-        return true;
 
     }
 

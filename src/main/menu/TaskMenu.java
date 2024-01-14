@@ -2,13 +2,14 @@ package main.menu;
 
 import main.models.Status;
 import main.models.Task;
-import main.TaskManager;
+import main.Main;
+
 
 import java.util.Scanner;
 
 public class TaskMenu {
     static Scanner scanner = new Scanner(System.in);
-
+    
     public static void showTaskMenu()
     {
         while (true) {
@@ -58,14 +59,14 @@ public class TaskMenu {
         String title = scanner.nextLine();
         System.out.println("Введите описание задачи:");
         String description = scanner.nextLine();
-        Task newTask = new Task(title, description, TaskManager.getNewTaskId(), Status.NEW);
-        TaskManager.addTask(newTask);
+        Task newTask = new Task(title, description, 0, Status.NEW);
+        Main.taskManager.addTask(newTask);
     }
     //2 - Получение списка всех задач
     public static void showAllTasks() {
         System.out.println("Список всех задач");
         System.out.println("--------------------------");
-        for (Task t: TaskManager.getAllTasks()) {
+        for (Task t: Main.taskManager.getAllTasks()) {
             System.out.println(t);
         }
         System.out.println("--------------------------");
@@ -76,7 +77,7 @@ public class TaskMenu {
         System.out.println("Вы действительно хотите очистить список задач? Y/N");
         String answer = scanner.nextLine();
         if (answer.equals("Y") || answer.equals("y")) {
-            TaskManager.deleteAllTasks();
+            Main.taskManager.deleteAllTasks();
             System.out.println("Cписок задач очищен");
         } else {
             System.out.println("Очистка прервана");
@@ -87,7 +88,7 @@ public class TaskMenu {
         System.out.println("Введите идентификатор задачи");
         int id = scanner.nextInt();
         scanner.nextLine();
-        Task t = TaskManager.getTaskById(id);
+        Task t = Main.taskManager.getTaskById(id);
         if (t != null) {
             System.out.println(t);
         } else {
@@ -99,7 +100,7 @@ public class TaskMenu {
         System.out.println("Введите идентификатор задачи:");
         int id = scanner.nextInt();
         scanner.nextLine();
-        Task t = TaskManager.getTaskById(id);
+        Task t = Main.taskManager.getTaskById(id);
         if (t != null) {
             System.out.println("Введите название задачи:");
             String title = scanner.nextLine();
@@ -127,7 +128,7 @@ public class TaskMenu {
                     return;
             }
             Task newTask = new Task(title, description, id, status);
-            TaskManager.updateTask(newTask);
+            Main.taskManager.updateTask(newTask);
             System.out.println("Задача обновлена");
         } else {
             System.out.println("Ошибка, не верный идентификатор");
@@ -139,9 +140,9 @@ public class TaskMenu {
     public static void deleteTask() {
         System.out.println("Введите идентификатор задачи");
         int id = scanner.nextInt();
-        Task t = TaskManager.getTaskById(id);
+        Task t = Main.taskManager.getTaskById(id);
         if (t != null) {
-            TaskManager.deleteTask(id);
+            Main.taskManager.deleteTask(id);
             System.out.println("Задача удалена");
         } else {
             System.out.println("Ошибка, не верный идентификатор");
@@ -152,7 +153,7 @@ public class TaskMenu {
     public static void changeTaskStatus() {
         System.out.println("Введите идентификатор задачи");
         int id = scanner.nextInt();
-        Task t = TaskManager.getTaskById(id);
+        Task t = Main.taskManager.getTaskById(id);
         if (t != null) {
             System.out.println("Введите статус задачи: 1 - NEW,\n" +
                     " 2 - IN_PROGRESS,\n" +
@@ -175,7 +176,7 @@ public class TaskMenu {
                     System.out.println("Ошибка, не корректный статус");
                     return;
             }
-            TaskManager.changeTaskStatus(t, status);
+            Main.taskManager.changeTaskStatus(t, status);
             System.out.println("Статус обновлен");
         } else {
             System.out.println("Ошибка, не верный идентификатор");

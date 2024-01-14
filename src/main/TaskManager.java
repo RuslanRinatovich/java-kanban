@@ -5,68 +5,62 @@ import main.models.Status;
 import main.models.Subtask;
 import main.models.Task;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
 public class TaskManager {
-    private static int idTask = 0;
-    private static int idSubTask = 0;
-    private static int idEpic = 0;
+    private int idTask = 0;
 
-
-    public static HashMap<Integer, Task> taskHashMap = new HashMap<>();
-    public static HashMap<Integer, Epic> epicHashMap = new HashMap<>();
-    public static HashMap<Integer, Subtask> subtaskHashMap = new HashMap<>();
+    public HashMap<Integer, Task> taskHashMap = new HashMap<>();
+    public HashMap<Integer, Epic> epicHashMap = new HashMap<>();
+    public HashMap<Integer, Subtask> subtaskHashMap = new HashMap<>();
 
 
     // -----------------------------------------------------------
     // Методы для работы с задачами
     // Формирование нового индентификатора для задачи
-    public static int getNewTaskId() {
+    private int getNewId() {
         idTask++;
         return idTask;
     }
 
     //  a. Получение списка всех задач.
-    public static Collection<Task> getAllTasks() {
-        return taskHashMap.values();
+    public ArrayList<Task> getAllTasks() {
+        return (ArrayList<Task>) taskHashMap.values();
     }
 
     // b. Удаление всех задач.
-    public static void deleteAllTasks() {
+    public void deleteAllTasks() {
         taskHashMap.clear();
-        idTask = 0;
     }
 
     //  c. Получение по идентификатору.
-    public static Task getTaskById(int id) {
-        if (taskHashMap.containsKey(id)) {
-            return taskHashMap.get(id);
-        }
-        return null;
+    public Task getTaskById(int id) {
+        return taskHashMap.get(id);
     }
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
-    public static void addTask(Task newTask) {
-
+    public void addTask(Task newTask) {
+        int id = getNewId();
+        newTask.setId(id);
         taskHashMap.put(newTask.getId(), newTask);
     }
 
     //e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
-    public static void updateTask(Task newTask) {
-
+    public void updateTask(Task newTask) {
         taskHashMap.replace(newTask.getId(), newTask);
     }
 
     // f. Удаление по идентификатору.
-    public static void deleteTask(int id) {
+    public void deleteTask(int id) {
         if (taskHashMap.containsKey(id)) {
             taskHashMap.remove(id);
         }
     }
 
     // g. изменение статуса задачи
-    public static void changeTaskStatus(Task task, Status status) {
+    public void changeTaskStatus(Task task, Status status) {
         task.setStatus(status);
     }
 
@@ -75,50 +69,43 @@ public class TaskManager {
     // Методы для работы с подзадачами
     // -----------------------------------------------------------
 
-
-    public static int getNewSubtaskId() {
-        idSubTask++;
-        return idSubTask;
-    }
-
     //  a. Получение списка всех подзадач.
-    public static Collection<Subtask> getAllSubtasks() {
-        return subtaskHashMap.values();
+    public ArrayList<Subtask> getAllSubtasks() {
+        return (ArrayList<Subtask>) subtaskHashMap.values();
     }
-
     //b. Удаление всех подзадач
-    public static void deleteAllSubtasks() {
+    public void deleteAllSubtasks() {
         // во всех эпиках очищаем список индентификаторов его подзадач
         for (Epic e : epicHashMap.values()) {
             e.clearAllSubtasks();
         }
         subtaskHashMap.clear();
-        idSubTask = 0;
     }
 
     //  c. Получение подзадачи по идентификатору.
-    public static Subtask getSubtaskById(int id) {
-        if (subtaskHashMap.containsKey(id)) {
+    public Subtask getSubtaskById(int id) {
             return subtaskHashMap.get(id);
-        }
-        return null;
     }
 
     // d. Создание подзадачи. Сам объект должен передаваться в качестве параметра.
-    public static void addSubtask(Subtask newSubtask) {
-        subtaskHashMap.put(newSubtask.getId(), newSubtask);
+    public void addSubtask(Subtask newSubtask) {
+        int id = getNewId();
+        newSubtask.setId(id);
+        subtaskHashMap.put(id, newSubtask);
         Epic epic = epicHashMap.get(newSubtask.getEpicId());
-        epic.addSubtaskId(newSubtask.getId());
+        epic.addSubtaskId(id);
         updateEpicStatus(epic);
     }
 
     //e. Обновление подзадачи. Новая версия объекта с верным идентификатором передаётся в виде параметра.
-    public static void updateSubtask(Subtask newSubtask) {
-        addSubtask(newSubtask);
+    public void updateSubtask(Subtask newSubtask) {
+        subtaskHashMap.replace(newSubtask.getId(), newSubtask);
+        Epic epic = epicHashMap.get(newSubtask.getEpicId());
+        updateEpicStatus(epic);
     }
 
     // f. Удаление подзадачи по идентификатору.
-    public static void deleteSubtask(int id) {
+    public void deleteSubtask(int id) {
         if (subtaskHashMap.containsKey(id)) {
             Subtask subtask = subtaskHashMap.get(id);
             Epic epic = epicHashMap.get(subtask.getEpicId());
@@ -129,7 +116,7 @@ public class TaskManager {
         }
     }
 
-    public static void changeSubtaskStatus(Subtask subtask, Status status) {
+    public void changeSubtaskStatus(Subtask subtask, Status status) {
         // при изменении статуса подзадачи надо пересмотреть статус Эпика
         subtask.setStatus(status);
         Epic epic = epicHashMap.get(subtask.getEpicId());
@@ -138,9 +125,9 @@ public class TaskManager {
 
 
     //метод для проверки имеют ли все подзадачи эпика один и тот же статус
-    public static boolean hasAllSubtaskSameStatus(Status status, Epic epic) {
+    public boolean hasAllSubtaskSameStatus(Status status, Epic epic) {
         for (int i : epic.getSubtasksIds()) {
-            if (subtaskHashMap.get(i).status != status)
+            if (subtaskHashMap.get(i).getStatus() != status)
                 return false;
         }
         return true;
@@ -149,45 +136,39 @@ public class TaskManager {
 
     // ЭПИКИ
     //Формирование нового индентификатора для эпика
-    public static int getNewEpiсId() {
-        idEpic++;
-        return idEpic;
-    }
-
     //  a. Получение списка всех эпиков.
-    public static Collection<Epic> getAllEpics() {
-        return epicHashMap.values();
+    public ArrayList<Epic> getAllEpics() {
+        return (ArrayList<Epic>) epicHashMap.values();
     }
-
     // b. Удаление всех эпиков и их подзадач.
-    public static void deleteAllEpics() {
+    public void deleteAllEpics() {
         epicHashMap.clear();
         subtaskHashMap.clear();
-        idSubTask = 0;
-        idEpic = 0;
     }
-
     //  c. Получение по идентификатору.
-    public static Epic getEpicById(int id) {
-        if (epicHashMap.containsKey(id)) {
+    public Epic getEpicById(int id) {
             return epicHashMap.get(id);
-        }
-        return null;
     }
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
-    public static void addEpic(Epic newEpic) {
-        epicHashMap.put(newEpic.getId(), newEpic);
+    public void addEpic(Epic newEpic) {
+        int id = getNewId();
+        newEpic.setId(id);
+        epicHashMap.put(id, newEpic);
     }
 
     //e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
-    public static void updateEpic(Epic newEpic) {
-
-        addEpic(newEpic);
+    public void updateEpic(Epic newEpic) {
+        epicHashMap.replace(newEpic.getId(), newEpic);
     }
 
+
+    public void removeSubtask(Epic epic, int id) {
+        epic.removeSubtask(id);
+        updateEpicStatus(epic);
+    }
     // f. Удаление по идентификатору.
-    public static void deleteEpic(int id) {
+    public void deleteEpic(int id) {
         if (epicHashMap.containsKey(id)) {
             Epic epic = epicHashMap.get(id);
             // удаляем подзадачи из subtaskHashMap
@@ -199,7 +180,7 @@ public class TaskManager {
     }
 
     // метод обновления статуса Эпика
-    public static void updateEpicStatus(Epic epic) {
+    private void updateEpicStatus(Epic epic) {
         // список подзадач пуст
         if (epic.getSubtasksIds().isEmpty()) {
             epic.setStatus(Status.NEW);
