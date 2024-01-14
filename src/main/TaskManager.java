@@ -44,7 +44,7 @@ public class TaskManager {
     public void addTask(Task newTask) {
         int id = getNewId();
         newTask.setId(id);
-        taskHashMap.put(newTask.getId(), newTask);
+        taskHashMap.put(id, newTask);
     }
 
     //e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
