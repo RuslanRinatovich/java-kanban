@@ -15,9 +15,10 @@ public class Main {
                     TaskMenu.showTaskMenu();
                     break;
                 case "2":
-                    SubtaskMenu.showSubtaskMenu();
+                    EpicMenu.showEpicMenu();
                     break;
                 case "3":
+                    SubtaskMenu.showSubtaskMenu();
                     break;
                 case "4":
                     return;

@@ -39,5 +39,14 @@ public class Epic extends Task {
         this.status = Status.NEW;
     }
 
-
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "subtasksIds=" + subtasksIds +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                '}';
+    }
 }

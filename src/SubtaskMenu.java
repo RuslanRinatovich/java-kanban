@@ -70,7 +70,8 @@ public class SubtaskMenu {
         System.out.println("Список всех подзадач");
         System.out.println("--------------------------");
         for (Subtask t : TaskManager.getAllSubtasks()) {
-            System.out.println(t);
+            Epic epic = TaskManager.getEpicById(t.getEpicId());
+            System.out.println("Эпик: " + epic.getTitle() + "\n" + t);
         }
         System.out.println("--------------------------");
 
@@ -95,6 +96,8 @@ public class SubtaskMenu {
         scanner.nextLine();
         Subtask t = TaskManager.getSubtaskById(id);
         if (t != null) {
+            Epic epic = TaskManager.getEpicById(t.getEpicId());
+            System.out.println("Эпик: " + epic.getTitle());
             System.out.println(t);
         } else {
             System.out.println("Ошибка, не верный идентификатор");
