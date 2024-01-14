@@ -52,7 +52,7 @@ public class TaskMenu {
         String title = scanner.nextLine();
         System.out.println("Введите описание задачи:");
         String description = scanner.nextLine();
-        Task newTask = new Task(title, description, TaskManager.getNewIdTask(), Status.NEW);
+        Task newTask = new Task(title, description, TaskManager.getNewTaskId(), Status.NEW);
         TaskManager.addTask(newTask);
     }
     //2 - Получение списка всех задач
