@@ -1,3 +1,9 @@
+package main.menu;
+
+import main.models.Status;
+import main.models.Task;
+import main.TaskManager;
+
 import java.util.Scanner;
 
 public class TaskMenu {

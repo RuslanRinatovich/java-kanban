@@ -1,3 +1,10 @@
+package main.menu;
+
+import main.models.Epic;
+import main.models.Status;
+import main.models.Subtask;
+import main.TaskManager;
+
 import java.util.Scanner;
 
 public class SubtaskMenu {

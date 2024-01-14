@@ -1,5 +1,6 @@
+package main.models;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Epic extends Task {
     public ArrayList<Integer> getSubtasksIds() {
@@ -41,7 +42,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
+        return "main.models.Epic{" +
                 "subtasksIds=" + subtasksIds +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +

@@ -1,3 +1,9 @@
+package main;
+
+import main.menu.EpicMenu;
+import main.menu.SubtaskMenu;
+import main.menu.TaskMenu;
+
 import java.util.Scanner;
 
 

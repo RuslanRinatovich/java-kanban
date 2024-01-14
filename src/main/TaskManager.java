@@ -1,3 +1,10 @@
+package main;
+
+import main.models.Epic;
+import main.models.Status;
+import main.models.Subtask;
+import main.models.Task;
+
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -7,15 +14,14 @@ public class TaskManager {
     private static int idEpic = 0;
 
 
-    static HashMap<Integer, Task> taskHashMap = new HashMap<>();
-    static HashMap<Integer, Epic> epicHashMap = new HashMap<>();
-
-    static HashMap<Integer, Subtask> subtaskHashMap = new HashMap<>();
+    public static HashMap<Integer, Task> taskHashMap = new HashMap<>();
+    public static HashMap<Integer, Epic> epicHashMap = new HashMap<>();
+    public static HashMap<Integer, Subtask> subtaskHashMap = new HashMap<>();
 
 
     // -----------------------------------------------------------
     // Методы для работы с задачами
-    //Формирование нового инденетификатора для задачи
+    // Формирование нового индентификатора для задачи
     public static int getNewTaskId() {
         idTask++;
         return idTask;

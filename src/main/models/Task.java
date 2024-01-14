@@ -1,3 +1,5 @@
+package main.models;
+
 import java.util.Objects;
 
 public class Task {
@@ -5,7 +7,7 @@ public class Task {
     protected String description;
     protected int id;
 
-    protected Status status;
+    public Status status;
 
     public Task(String title, String description, int id, Status status) {
         this.title = title;
@@ -61,7 +63,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "main.models.Task{" +
                 "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
