@@ -65,7 +65,7 @@ public class SubtaskMenu {
         System.out.println("Введите идентификатор эпика:");
         int id = scanner.nextInt();
         scanner.nextLine();
-        if (Main.taskManager.epicHashMap.containsKey(id)) {
+        if (Main.taskManager.getEpicHashMap().containsKey(id)) {
             Subtask newSubtask = new Subtask(title, description, 0, Status.NEW, id);
             Main.taskManager.addSubtask(newSubtask);
         } else {

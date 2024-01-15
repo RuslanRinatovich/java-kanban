@@ -11,11 +11,21 @@ import java.util.HashMap;
 
 public class TaskManager {
     private int idTask = 0;
+    private HashMap<Integer, Task> taskHashMap = new HashMap<>();
+    private HashMap<Integer, Epic> epicHashMap = new HashMap<>();
+    private HashMap<Integer, Subtask> subtaskHashMap = new HashMap<>();
 
-    public HashMap<Integer, Task> taskHashMap = new HashMap<>();
-    public HashMap<Integer, Epic> epicHashMap = new HashMap<>();
-    public HashMap<Integer, Subtask> subtaskHashMap = new HashMap<>();
+    public HashMap<Integer, Task> getTaskHashMap() {
+        return taskHashMap;
+    }
 
+    public HashMap<Integer, Epic> getEpicHashMap() {
+        return epicHashMap;
+    }
+
+    public HashMap<Integer, Subtask> getSubtaskHashMap() {
+        return subtaskHashMap;
+    }
 
     // -----------------------------------------------------------
     // Методы для работы с задачами
@@ -73,6 +83,7 @@ public class TaskManager {
     public ArrayList<Subtask> getAllSubtasks() {
         return (ArrayList<Subtask>) subtaskHashMap.values();
     }
+
     //b. Удаление всех подзадач
     public void deleteAllSubtasks() {
         // во всех эпиках очищаем список индентификаторов его подзадач
@@ -84,7 +95,7 @@ public class TaskManager {
 
     //  c. Получение подзадачи по идентификатору.
     public Subtask getSubtaskById(int id) {
-            return subtaskHashMap.get(id);
+        return subtaskHashMap.get(id);
     }
 
     // d. Создание подзадачи. Сам объект должен передаваться в качестве параметра.
@@ -140,14 +151,16 @@ public class TaskManager {
     public ArrayList<Epic> getAllEpics() {
         return (ArrayList<Epic>) epicHashMap.values();
     }
+
     // b. Удаление всех эпиков и их подзадач.
     public void deleteAllEpics() {
         epicHashMap.clear();
         subtaskHashMap.clear();
     }
+
     //  c. Получение по идентификатору.
     public Epic getEpicById(int id) {
-            return epicHashMap.get(id);
+        return epicHashMap.get(id);
     }
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
@@ -167,6 +180,7 @@ public class TaskManager {
         epic.removeSubtask(id);
         updateEpicStatus(epic);
     }
+
     // f. Удаление по идентификатору.
     public void deleteEpic(int id) {
         if (epicHashMap.containsKey(id)) {
@@ -199,6 +213,5 @@ public class TaskManager {
         }
         epic.setStatus(Status.IN_PROGRESS);
     }
-
 
 }
