@@ -1,37 +1,93 @@
 package main;
 
-import main.menu.EpicMenu;
-import main.menu.SubtaskMenu;
-import main.menu.TaskMenu;
+import main.models.Epic;
+import main.models.Status;
+import main.models.Subtask;
+import main.models.Task;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
 public class Main {
     static Scanner scanner;
-    public static TaskManager taskManager = new TaskManager();
+    static Managers managers = new Managers();
+    public static TaskManager taskManager = managers.getDefault();
 
     public static void main(String[] args) {
         scanner = new Scanner(System.in);
         System.out.println("Поехали!");
-        while (true) {
-            printMainMenu();
-            String command = scanner.nextLine();
-            switch (command) {
-                case "1":
-                    TaskMenu.showTaskMenu();
-                    break;
-                case "2":
-                    EpicMenu.showEpicMenu();
-                    break;
-                case "3":
-                    SubtaskMenu.showSubtaskMenu();
-                    break;
-                case "4":
-                    return;
-            }
+
+        Task task1 = new Task("Задача 1", "Описание задачи 1", 0, Status.NEW);
+        Task task2 = new Task("Задача 2", "Описание задачи 2", 0, Status.NEW);
+        Task task3 = new Task("Задача 3", "Описание задачи 3", 0, Status.NEW);
+        taskManager.addTask(task1);
+
+        taskManager.addTask(task2);
+        taskManager.addTask(task3);
+
+
+        Epic epic1 = new Epic("Эпик 1", "Описание Эпика 1", 0, Status.NEW, new ArrayList<>());
+        Epic epic2 = new Epic("Эпик 2", "Описание Эпика 2", 0, Status.NEW, new ArrayList<>());
+        Epic epic3 = new Epic("Эпик 3", "Описание Эпика 3", 0, Status.NEW, new ArrayList<>());
+
+        taskManager.addEpic(epic1);
+        taskManager.addEpic(epic2);
+        taskManager.addEpic(epic3);
+
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", 0, Status.NEW, epic1.getId());
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", 0, Status.NEW, epic1.getId());
+        Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", 0, Status.NEW, epic2.getId());
+        Subtask subtask4 = new Subtask("Подзадача 4", "Описание подзадачи 4", 0, Status.NEW, epic2.getId());
+        Subtask subtask5 = new Subtask("Подзадача 5", "Описание подзадачи 5", 0, Status.NEW, epic3.getId());
+        Subtask subtask6 = new Subtask("Подзадача 6", "Описание подзадачи 6", 0, Status.NEW, epic3.getId());
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+        taskManager.addSubtask(subtask3);
+        taskManager.addSubtask(subtask4);
+        taskManager.addSubtask(subtask5);
+        taskManager.addSubtask(subtask6);
+
+        System.out.println(taskManager.getTaskById(1));
+        System.out.println(taskManager.getTaskById(2));
+        System.out.println(taskManager.getTaskById(3));
+
+        task1.setTitle("Задача 111");
+        System.out.println(taskManager.getTaskById(1));
+        task1.setTitle("Задача 11111");
+        System.out.println(taskManager.getTaskById(1));
+        task1.setTitle("Задача 111111");
+        System.out.println(taskManager.getTaskById(1));
+        System.out.println(taskManager.getTaskById(1));
+        System.out.println(taskManager.getEpicById(4));
+        System.out.println(taskManager.getEpicById(5));
+        System.out.println(taskManager.getEpicById(6));
+        System.out.println(taskManager.getEpicById(4));
+        System.out.println(taskManager.getEpicById(5));
+
+        printAllTasks(taskManager);
+
+    }
+
+    private static void printAllTasks(TaskManager manager) {
+        System.out.println("Задачи:");
+        for (Task task : manager.getAllTasks()) {
+            System.out.println(task);
+        }
+        System.out.println("Эпики:");
+        for (Epic epic : manager.getAllEpics()) {
+            System.out.println(epic);
+
+        }
+        System.out.println("Подзадачи:");
+        for (Subtask subtask : manager.getAllSubtasks()) {
+            System.out.println(subtask);
         }
 
+        System.out.println("История:");
+        for (Task task : manager.getHistoryTask()) {
+            System.out.println(task);
+        }
     }
 
     public static void printMainMenu() {
