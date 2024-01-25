@@ -8,15 +8,16 @@ import main.models.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface TaskManager {
-    HashMap<Integer, Task> getTaskHashMap();
+    Map<Integer, Task> getTaskHashMap();
 
-    HashMap<Integer, Epic> getEpicHashMap();
+    Map<Integer, Epic> getEpicHashMap();
 
-    HashMap<Integer, Subtask> getSubtaskHashMap();
+    Map<Integer, Subtask> getSubtaskHashMap();
 
-    List<Task> getHistoryTask();
+    List<Task> getHistory();
 
     // -----------------------------------------------------------
     // Методы для работы с задачами

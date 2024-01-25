@@ -11,8 +11,7 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner scanner;
-    static Managers managers = new Managers();
-    public static TaskManager taskManager = managers.getDefault();
+    public static TaskManager taskManager = Managers.getDefault();
 
     public static void main(String[] args) {
         scanner = new Scanner(System.in);
@@ -85,7 +84,7 @@ public class Main {
         }
 
         System.out.println("История:");
-        for (Task task : manager.getHistoryTask()) {
+        for (Task task : manager.getHistory()) {
             System.out.println(task);
         }
     }

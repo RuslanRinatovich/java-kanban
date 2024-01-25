@@ -9,32 +9,35 @@ import main.models.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
     private int idTask = 0;
-    private List<Task> historyTask = new ArrayList<>();
-    private HashMap<Integer, Task> taskHashMap = new HashMap<>();
-    private HashMap<Integer, Epic> epicHashMap = new HashMap<>();
-    private HashMap<Integer, Subtask> subtaskHashMap = new HashMap<>();
+    private final HistoryManager historyManager;
+    private final Map<Integer, Task> taskHashMap = new HashMap<>();
+    private final Map<Integer, Epic> epicHashMap = new HashMap<>();
+    private final Map<Integer, Subtask> subtaskHashMap = new HashMap<>();
 
     @Override
-    public HashMap<Integer, Task> getTaskHashMap() {
+    public Map<Integer, Task> getTaskHashMap() {
         return taskHashMap;
     }
-
     @Override
-    public HashMap<Integer, Epic> getEpicHashMap() {
+    public Map<Integer, Epic> getEpicHashMap() {
         return epicHashMap;
     }
 
     @Override
-    public HashMap<Integer, Subtask> getSubtaskHashMap() {
+    public Map<Integer, Subtask> getSubtaskHashMap() {
         return subtaskHashMap;
     }
 
+    public InMemoryTaskManager(HistoryManager historyManager){
+        this.historyManager = historyManager;
+    }
     @Override
-    public List<Task> getHistoryTask() {
-        return historyTask;
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
     // -----------------------------------------------------------
@@ -63,9 +66,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTaskById(int id) {
         Task t = taskHashMap.get(id);
         Task clonedTaskFoHistory = new Task(t.getTitle(), t.getDescription(), t.getId(), t.getStatus());
-        if (historyTask.size() == 10)
-            historyTask.remove(0);
-        historyTask.add(clonedTaskFoHistory);
+        historyManager.add(clonedTaskFoHistory);
         return t;
     }
 
@@ -123,9 +124,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask getSubtaskById(int id) {
         Subtask t = subtaskHashMap.get(id);
         Subtask clonedTaskFoHistory = new Subtask(t.getTitle(), t.getDescription(), t.getId(), t.getStatus(), t.getEpicId());
-        if (historyTask.size() == 10)
-            historyTask.remove(0);
-        historyTask.add(clonedTaskFoHistory);
+        historyManager.add(clonedTaskFoHistory);
         return t;
     }
 
@@ -202,9 +201,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpicById(int id) {
         Epic t = epicHashMap.get(id);
         Epic clonedTaskFoHistory = new Epic(t.getTitle(), t.getDescription(), t.getId(), t.getStatus(), t.getSubtasksIds());
-        if (historyTask.size() == 10)
-            historyTask.remove(0);
-        historyTask.add(clonedTaskFoHistory);
+        historyManager.add(clonedTaskFoHistory);
 
         return t;
     }
