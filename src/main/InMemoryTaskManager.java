@@ -18,6 +18,10 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Epic> epicHashMap = new HashMap<>();
     private final Map<Integer, Subtask> subtaskHashMap = new HashMap<>();
 
+    public InMemoryTaskManager(HistoryManager historyManager) {
+        this.historyManager = historyManager;
+    }
+
     @Override
     public Map<Integer, Task> getTaskHashMap() {
         return taskHashMap;
@@ -33,9 +37,6 @@ public class InMemoryTaskManager implements TaskManager {
         return subtaskHashMap;
     }
 
-    public InMemoryTaskManager(HistoryManager historyManager) {
-        this.historyManager = historyManager;
-    }
 
     @Override
     public List<Task> getHistory() {
