@@ -58,19 +58,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     //  a. Получение списка всех задач.
     @Override
-    public List<Task> getAllTasks() {
+    public List<Task> getTasks() {
         return new ArrayList<Task>(taskHashMap.values());
     }
 
     // b. Удаление всех задач.
     @Override
-    public void deleteAllTasks() {
+    public void deleteTasks() {
         taskHashMap.clear();
     }
 
     //  c. Получение по идентификатору.
     @Override
-    public Task getTaskById(int id) {
+    public Task getTask(int id) {
         if (taskHashMap.containsKey(id)) {
             Task t = taskHashMap.get(id);
             Task clonedTaskFoHistory = new Task(t.getTitle(), t.getDescription(), t.getId(), t.getStatus());
@@ -115,13 +115,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     //  a. Получение списка всех подзадач.
     @Override
-    public List<Subtask> getAllSubtasks() {
+    public List<Subtask> getSubtasks() {
         return new ArrayList<Subtask>(subtaskHashMap.values());
     }
 
     //b. Удаление всех подзадач
     @Override
-    public void deleteAllSubtasks() {
+    public void deleteSubtasks() {
         // во всех эпиках очищаем список индентификаторов его подзадач
         for (Epic e : epicHashMap.values()) {
             e.clearAllSubtasks();
@@ -131,7 +131,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     //  c. Получение подзадачи по идентификатору.
     @Override
-    public Subtask getSubtaskById(int id) {
+    public Subtask getSubtask(int id) {
 
         if (subtaskHashMap.containsKey(id)) {
             Subtask t = subtaskHashMap.get(id);
@@ -198,21 +198,21 @@ public class InMemoryTaskManager implements TaskManager {
     //Формирование нового индентификатора для эпика
     //  a. Получение списка всех эпиков.
     @Override
-    public List<Epic> getAllEpics() {
+    public List<Epic> getEpics() {
         return new ArrayList<Epic>(epicHashMap.values());
     }
 
 
     // b. Удаление всех эпиков и их подзадач.
     @Override
-    public void deleteAllEpics() {
+    public void deleteEpics() {
         epicHashMap.clear();
         subtaskHashMap.clear();
     }
 
     //  c. Получение по идентификатору.
     @Override
-    public Epic getEpicById(int id) {
+    public Epic getEpic(int id) {
         if (epicHashMap.containsKey(id)) {
             Epic t = epicHashMap.get(id);
             Epic clonedTaskFoHistory = new Epic(t.getTitle(), t.getDescription(), t.getId(), t.getStatus(), t.getSubtasksIds());
@@ -240,7 +240,7 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override
-    public void removeSubtask(Epic epic, int id) {
+    public void removeEpicSubtask(Epic epic, int id) {
         epic.removeSubtask(id);
         updateEpicStatus(epic);
     }

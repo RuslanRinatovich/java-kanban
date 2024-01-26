@@ -54,16 +54,16 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void add() {
-        Task t = inMemoryTaskManager.getTaskById(1);
+        Task t = inMemoryTaskManager.getTask(1);
         final List<Task> history = inMemoryTaskManager.getHistory();
         assertNotNull(history, "История не пустая.");
         assertEquals(1, history.size(), "История не пустая.");
     }
     @Test
     void ShouldDeleteFirstItemFromListWhenTryToAddNewTaskToFullList() {
-        Task t = inMemoryTaskManager.getTaskById(2);
+        Task t = inMemoryTaskManager.getTask(2);
         for (int i = 0; i < 9; i++) {
-            t = inMemoryTaskManager.getTaskById(1);
+            t = inMemoryTaskManager.getTask(1);
         }
         final List<Task> history = inMemoryTaskManager.getHistory();
         int id = history.get(0).getId();
@@ -73,9 +73,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void CheckIfHistoryContainsTasksSubtasksAndEpics() {
-        Task t = inMemoryTaskManager.getTaskById(1);
-        Subtask subtask = inMemoryTaskManager.getSubtaskById(10);
-        Epic epic = inMemoryTaskManager.getEpicById(4);
+        Task t = inMemoryTaskManager.getTask(1);
+        Subtask subtask = inMemoryTaskManager.getSubtask(10);
+        Epic epic = inMemoryTaskManager.getEpic(4);
         final List<Task> history = inMemoryTaskManager.getHistory();
         boolean containsEpics = false;
         boolean containsTasks = false;

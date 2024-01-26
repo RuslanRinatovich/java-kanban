@@ -5,8 +5,6 @@ import main.models.Status;
 import main.models.Subtask;
 import main.models.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,13 +24,13 @@ public interface TaskManager {
     int getNewId();
 
     //  a. Получение списка всех задач.
-    List<Task> getAllTasks();
+    List<Task> getTasks();
 
     // b. Удаление всех задач.
-    void deleteAllTasks();
+    void deleteTasks();
 
     //  c. Получение по идентификатору.
-    Task getTaskById(int id);
+    Task getTask(int id);
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     void addTask(Task newTask);
@@ -47,13 +45,13 @@ public interface TaskManager {
     void changeTaskStatus(Task task, Status status);
 
     //  a. Получение списка всех подзадач.
-    List<Subtask> getAllSubtasks();
+    List<Subtask> getSubtasks();
 
     //b. Удаление всех подзадач
-    void deleteAllSubtasks();
+    void deleteSubtasks();
 
     //  c. Получение подзадачи по идентификатору.
-    Subtask getSubtaskById(int id);
+    Subtask getSubtask(int id);
 
     // d. Создание подзадачи. Сам объект должен передаваться в качестве параметра.
     void addSubtask(Subtask newSubtask);
@@ -72,13 +70,13 @@ public interface TaskManager {
     // ЭПИКИ
     //Формирование нового индентификатора для эпика
     //  a. Получение списка всех эпиков.
-    List<Epic> getAllEpics();
+    List<Epic> getEpics();
 
     // b. Удаление всех эпиков и их подзадач.
-    void deleteAllEpics();
+    void deleteEpics();
 
     //  c. Получение по идентификатору.
-    Epic getEpicById(int id);
+    Epic getEpic(int id);
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     void addEpic(Epic newEpic);
@@ -86,7 +84,7 @@ public interface TaskManager {
     //e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     void updateEpic(Epic newEpic);
 
-    void removeSubtask(Epic epic, int id);
+    void removeEpicSubtask(Epic epic, int id);
 
     // f. Удаление по идентификатору.
     void deleteEpic(int id);
