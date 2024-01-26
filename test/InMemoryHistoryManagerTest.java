@@ -17,6 +17,7 @@ class InMemoryHistoryManagerTest {
 
     private static TaskManager inMemoryTaskManager;
     private static HistoryManager historyManager;
+
     @BeforeEach
     public void setUp() {
         inMemoryTaskManager = Managers.getDefault();
@@ -58,6 +59,17 @@ class InMemoryHistoryManagerTest {
         assertNotNull(history, "История не пустая.");
         assertEquals(1, history.size(), "История не пустая.");
     }
+    @Test
+    void ShouldDeleteFirstItemFromListWhenTryToAddNewTaskToFullList() {
+        Task t = inMemoryTaskManager.getTaskById(2);
+        for (int i = 0; i < 9; i++) {
+            t = inMemoryTaskManager.getTaskById(1);
+        }
+        final List<Task> history = inMemoryTaskManager.getHistory();
+        int id = history.get(0).getId();
+        assertEquals(id, 2, "Не верный идентификатор первого таска");
+        assertEquals(10, history.size(), "Количество записей в истории больше 10");
+    }
 
     @Test
     void CheckIfHistoryContainsTasksSubtasksAndEpics() {
@@ -69,14 +81,14 @@ class InMemoryHistoryManagerTest {
         boolean containsTasks = false;
         boolean containsSubtasks = false;
         boolean contains = false;
-        for (Task x: history) {
-            if (x instanceof Epic){
+        for (Task x : history) {
+            if (x instanceof Epic) {
                 containsEpics = true;
             }
-            if (x instanceof Subtask){
+            if (x instanceof Subtask) {
                 containsSubtasks = true;
             }
-            if (x instanceof Task){
+            if (x instanceof Task) {
                 containsTasks = true;
             }
             contains = containsEpics && containsSubtasks && containsTasks;
@@ -86,7 +98,4 @@ class InMemoryHistoryManagerTest {
         assertTrue(contains, "Задачи одного типа");
     }
 
-    @Test
-    void getHistory() {
-    }
 }
