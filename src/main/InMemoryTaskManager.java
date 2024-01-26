@@ -22,6 +22,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Map<Integer, Task> getTaskHashMap() {
         return taskHashMap;
     }
+
     @Override
     public Map<Integer, Epic> getEpicHashMap() {
         return epicHashMap;
@@ -32,9 +33,10 @@ public class InMemoryTaskManager implements TaskManager {
         return subtaskHashMap;
     }
 
-    public InMemoryTaskManager(HistoryManager historyManager){
+    public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
     }
+
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
@@ -42,6 +44,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     // -----------------------------------------------------------
     // Методы для работы с задачами
+    @Override
+    public int getId() {
+        return idTask;
+    }
+
     // Формирование нового индентификатора для задачи
     @Override
     public int getNewId() {
@@ -64,10 +71,13 @@ public class InMemoryTaskManager implements TaskManager {
     //  c. Получение по идентификатору.
     @Override
     public Task getTaskById(int id) {
-        Task t = taskHashMap.get(id);
-        Task clonedTaskFoHistory = new Task(t.getTitle(), t.getDescription(), t.getId(), t.getStatus());
-        historyManager.add(clonedTaskFoHistory);
-        return t;
+        if (taskHashMap.containsKey(id)) {
+            Task t = taskHashMap.get(id);
+            Task clonedTaskFoHistory = new Task(t.getTitle(), t.getDescription(), t.getId(), t.getStatus());
+            historyManager.add(clonedTaskFoHistory);
+            return t;
+        }
+        return null;
     }
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
@@ -122,10 +132,14 @@ public class InMemoryTaskManager implements TaskManager {
     //  c. Получение подзадачи по идентификатору.
     @Override
     public Subtask getSubtaskById(int id) {
-        Subtask t = subtaskHashMap.get(id);
-        Subtask clonedTaskFoHistory = new Subtask(t.getTitle(), t.getDescription(), t.getId(), t.getStatus(), t.getEpicId());
-        historyManager.add(clonedTaskFoHistory);
-        return t;
+
+        if (subtaskHashMap.containsKey(id)) {
+            Subtask t = subtaskHashMap.get(id);
+            Subtask clonedTaskFoHistory = new Subtask(t.getTitle(), t.getDescription(), t.getId(), t.getStatus(), t.getEpicId());
+            historyManager.add(clonedTaskFoHistory);
+            return t;
+        }
+        return null;
     }
 
     // d. Создание подзадачи. Сам объект должен передаваться в качестве параметра.
@@ -185,7 +199,7 @@ public class InMemoryTaskManager implements TaskManager {
     //  a. Получение списка всех эпиков.
     @Override
     public List<Epic> getAllEpics() {
-        return new ArrayList<Epic> (epicHashMap.values());
+        return new ArrayList<Epic>(epicHashMap.values());
     }
 
 
@@ -199,16 +213,20 @@ public class InMemoryTaskManager implements TaskManager {
     //  c. Получение по идентификатору.
     @Override
     public Epic getEpicById(int id) {
-        Epic t = epicHashMap.get(id);
-        Epic clonedTaskFoHistory = new Epic(t.getTitle(), t.getDescription(), t.getId(), t.getStatus(), t.getSubtasksIds());
-        historyManager.add(clonedTaskFoHistory);
+        if (epicHashMap.containsKey(id)) {
+            Epic t = epicHashMap.get(id);
+            Epic clonedTaskFoHistory = new Epic(t.getTitle(), t.getDescription(), t.getId(), t.getStatus(), t.getSubtasksIds());
+            historyManager.add(clonedTaskFoHistory);
 
-        return t;
+            return t;
+        }
+        return null;
     }
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     @Override
     public void addEpic(Epic newEpic) {
+
         int id = getNewId();
         newEpic.setId(id);
         epicHashMap.put(id, newEpic);
