@@ -14,6 +14,11 @@ import java.util.Map;
 public class InMemoryTaskManager implements TaskManager {
     private int idTask = 0;
     private final HistoryManager historyManager;
+    // я так не делал, потому что один из ревьюеров написал студентам, что при такой
+    // реализации менеджер истории в оперативной памяти жестко зашивается в менеджер задач.
+    // Стоит использовать подход к инициализации поля через аргумент конструктора, это называется
+    // внедрением зависимости. Я реализовал так. Как лучше то?
+    // private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Map<Integer, Task> taskHashMap = new HashMap<>();
     private final Map<Integer, Epic> epicHashMap = new HashMap<>();
     private final Map<Integer, Subtask> subtaskHashMap = new HashMap<>();
@@ -45,13 +50,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     // -----------------------------------------------------------
     // Методы для работы с задачами
-    @Override
     public int getId() {
         return idTask;
     }
 
     // Формирование нового индентификатора для задачи
-    @Override
     public int getNewId() {
         idTask++;
         return idTask;
@@ -70,13 +73,25 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     //  c. Получение по идентификатору.
+    // Взято с метанита. объекты классов представляют ссылочные типы, то есть указывают на какой-то объект, расположенный в памяти
+    // Взято техзадания по покрытию тестами
+    // (убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных.)
+    // по заданию в истории я должен хранить разные версии одного и того же объекта под указанным Id
+    // я хочу реализовать клонирование(копирование) экзмепляра класса, чтобы сохранить в истории текущую версию
+    // для этой реализации есть два подхода: реализовать интерфейс Cloneable или
+    // создать новый экземпляр этого класса со значениями полей текущего экзмепляра классса(я выбрал второй вариант)
+    // могу убрать "копирование". Как тогда будет работать сохранение в менеджере предыдущих версии задач в Истории?
+    // я так понимаю, тогда в истории будут лежать просто ссылки, которые будут указывать на один и тот же участок памяти
+    //
+
     @Override
     public Task getTask(int id) {
         if (taskHashMap.containsKey(id)) {
-            Task t = taskHashMap.get(id);
-            Task clonedTaskFoHistory = new Task(t.getTitle(), t.getDescription(), t.getId(), t.getStatus());
+            Task task = taskHashMap.get(id);
+
+            Task clonedTaskFoHistory = new Task(task.getTitle(), task.getDescription(), task.getId(), task.getStatus());
             historyManager.add(clonedTaskFoHistory);
-            return t;
+            return task;
         }
         return null;
     }
@@ -135,10 +150,10 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask getSubtask(int id) {
 
         if (subtaskHashMap.containsKey(id)) {
-            Subtask t = subtaskHashMap.get(id);
-            Subtask clonedTaskFoHistory = new Subtask(t.getTitle(), t.getDescription(), t.getId(), t.getStatus(), t.getEpicId());
+            Subtask subtask = subtaskHashMap.get(id);
+            Subtask clonedTaskFoHistory = new Subtask(subtask.getTitle(), subtask.getDescription(), subtask.getId(), subtask.getStatus(), subtask.getEpicId());
             historyManager.add(clonedTaskFoHistory);
-            return t;
+            return subtask;
         }
         return null;
     }
