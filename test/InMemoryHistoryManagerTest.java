@@ -1,3 +1,4 @@
+
 import main.HistoryManager;
 import main.Managers;
 import main.TaskManager;
@@ -96,6 +97,17 @@ class InMemoryHistoryManagerTest {
                 break;
         }
         assertTrue(contains, "Задачи одного типа");
+    }
+    @Test
+    void CheckMyLinkedList()
+    {
+
+        Task t1 = inMemoryTaskManager.getTask(1);
+        Task t2 = inMemoryTaskManager.getTask(2);
+        Task t3 = inMemoryTaskManager.getTask(3);
+        final List<Task> history = inMemoryTaskManager.getHistory();
+        assertNotNull(history, "История не пустая.");
+        assertEquals(3, history.size(), "История не пустая.");
     }
 
 }

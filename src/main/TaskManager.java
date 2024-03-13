@@ -89,4 +89,8 @@ public interface TaskManager {
 
     // метод обновления статуса Эпика
     void updateEpicStatus(Epic epic);
+
+    int getNewId();
+
+    int getId();
 }
