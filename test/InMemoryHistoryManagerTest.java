@@ -103,8 +103,8 @@ class InMemoryHistoryManagerTest {
     {
 
         Task t1 = inMemoryTaskManager.getTask(1);
-        Task t2 = inMemoryTaskManager.getTask(2);
-        Task t3 = inMemoryTaskManager.getTask(3);
+
+        Task t2 = inMemoryTaskManager.getTask(1);
         final List<Task> history = inMemoryTaskManager.getHistory();
         assertNotNull(history, "История не пустая.");
         assertEquals(3, history.size(), "История не пустая.");
