@@ -17,10 +17,11 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         if (historyTask.containsKey(task.getId()))
         {
-            removeNode(historyTask.get(task.getId()));
+            int id = task.getId();
+            removeNode(historyTask.get(id));
+            remove(id);
         }
-        linkLast(task);
-        historyTask.put(task.getId(), tail);
+        historyTask.put(task.getId(), linkLast(task));
         //historyTask2.linkLast(task);
     }
 
@@ -62,12 +63,30 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public void removeNode(Node node)
     {
-        if (node.prev != null)
-            node.prev.next = node.next;
-        if (node.next != null)
-            node.next.prev = node.prev;
-        node.prev = null;
-        node.next = null;
+        // в списке один элемент
+        if (size == 1)
+        {
+            head = null;
+            tail = null;
+        }
+        else
+        {
+            if (node.prev == null)
+            {
+                node.next.prev = null;
+                head = node.next;
+            }
+            else if (node.next == null)
+            {
+                node.prev.next = null;
+                tail = node.prev;
+            }
+            else
+            {
+                node.prev.next = node.next;
+                node.next.prev = node.prev;
+            }
+        }
     }
 
 
