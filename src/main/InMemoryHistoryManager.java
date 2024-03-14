@@ -1,4 +1,5 @@
 package main;
+
 import java.util.*;
 
 import main.models.Node;
@@ -13,34 +14,32 @@ public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> historyTask = new HashMap<>();
 
 
-
     @Override
     public void add(Task task) {
 
-        if (historyTask.containsKey(task.getId()))
-        {
+        if (historyTask.containsKey(task.getId())) {
             int id = task.getId();
             removeNode(historyTask.get(id));
             remove(id);
         }
         historyTask.put(task.getId(), linkLast(task));
-        //historyTask2.linkLast(task);
     }
+
     @Override
-    public Node getHead()
-    {
+    public Node getHead() {
         return head;
     }
 
     @Override
-    public Node getTail()
-    {
-       return tail;
+    public Node getTail() {
+        return tail;
     }
+
     @Override
     public void remove(int id) {
         historyTask.remove(id);
     }
+
     @Override
     public List<Task> getHistory() {
         return getTasks();
@@ -59,40 +58,29 @@ public class InMemoryHistoryManager implements HistoryManager {
         return newNode;
     }
 
-    public List<Task> getTasks()
-    {
+    public List<Task> getTasks() {
         ArrayList<Task> result = new ArrayList<>();
         Node current = head;
-        while (current != null)
-        {
+        while (current != null) {
             result.add(current.data);
             current = current.next;
         }
         return result;
     }
 
-    public void removeNode(Node node)
-    {
+    public void removeNode(Node node) {
         // в списке один элемент
-        if (size == 1)
-        {
+        if (size == 1) {
             head = null;
             tail = null;
-        }
-        else
-        {
-            if (node.prev == null)
-            {
+        } else {
+            if (node.prev == null) {
                 node.next.prev = null;
                 head = node.next;
-            }
-            else if (node.next == null)
-            {
+            } else if (node.next == null) {
                 node.prev.next = null;
                 tail = node.prev;
-            }
-            else
-            {
+            } else {
                 node.prev.next = node.next;
                 node.next.prev = node.prev;
             }
