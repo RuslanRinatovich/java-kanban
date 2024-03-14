@@ -13,7 +13,4 @@ public interface HistoryManager {
 
     List<Task> getHistory();
 
-    Node getTail();
-
-    Node getHead();
 }

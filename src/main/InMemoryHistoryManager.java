@@ -25,15 +25,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         historyTask.put(task.getId(), linkLast(task));
     }
 
-    @Override
-    public Node getHead() {
-        return head;
-    }
-
-    @Override
-    public Node getTail() {
-        return tail;
-    }
 
     @Override
     public void remove(int id) {

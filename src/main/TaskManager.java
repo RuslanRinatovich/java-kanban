@@ -92,8 +92,5 @@ public interface TaskManager {
     int getId();
 
 
-    Node getTail();
-
-    Node getHead();
 
 }
