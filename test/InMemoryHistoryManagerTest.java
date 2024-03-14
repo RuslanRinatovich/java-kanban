@@ -2,10 +2,7 @@
 import main.HistoryManager;
 import main.Managers;
 import main.TaskManager;
-import main.models.Epic;
-import main.models.Status;
-import main.models.Subtask;
-import main.models.Task;
+import main.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -60,8 +57,9 @@ class InMemoryHistoryManagerTest {
         assertNotNull(history, "История не пустая.");
         assertEquals(1, history.size(), "История не пустая.");
     }
+
     @Test
-    void ShouldDeleteFirstItemFromListWhenTryToAddNewTaskToFullList() {
+    void ShouldHistorySizeBeTheSameBecauseTheTaskHasSameId() {
         Task t = inMemoryTaskManager.getTask(2);
         for (int i = 0; i < 9; i++) {
             t = inMemoryTaskManager.getTask(1);
@@ -69,7 +67,7 @@ class InMemoryHistoryManagerTest {
         final List<Task> history = inMemoryTaskManager.getHistory();
         int id = history.get(0).getId();
         assertEquals(id, 2, "Не верный идентификатор первого таска");
-        assertEquals(10, history.size(), "Количество записей в истории больше 10");
+        assertEquals(2, history.size(), "Количество записей в истории больше 2");
     }
 
     @Test
@@ -98,16 +96,49 @@ class InMemoryHistoryManagerTest {
         }
         assertTrue(contains, "Задачи одного типа");
     }
+
     @Test
-    void CheckMyLinkedList()
-    {
+    void CheckIfHistoryDontHasNewTaskWhenTheTaskHasSameId() {
 
         Task t1 = inMemoryTaskManager.getTask(1);
+        Task t2 = inMemoryTaskManager.getTask(1);
+        final List<Task> history = inMemoryTaskManager.getHistory();
+        assertNotNull(history, "История не пустая.");
+        assertEquals(1, history.size(), "История не пустая.");
+    }
 
+
+    @Test
+    void CheckIfHistoryDontAddNewTaskWhenTheTaskHasSameId() {
+
+        Task t1 = inMemoryTaskManager.getTask(1);
+        Subtask subtask = inMemoryTaskManager.getSubtask(10);
+        Epic epic = inMemoryTaskManager.getEpic(4);
         Task t2 = inMemoryTaskManager.getTask(1);
         final List<Task> history = inMemoryTaskManager.getHistory();
         assertNotNull(history, "История не пустая.");
         assertEquals(3, history.size(), "История не пустая.");
+    }
+
+    @Test
+    void ShouldAddTaskToTheTail() {
+
+        Task t1 = inMemoryTaskManager.getTask(1);
+        Subtask subtask = inMemoryTaskManager.getSubtask(10);
+        Epic epic = inMemoryTaskManager.getEpic(4);
+        Task t2 = inMemoryTaskManager.getTask(1);
+        final Node node = inMemoryTaskManager.getTail();
+        assertEquals(node.data, t2, "конечный узел не совпадает");
+    }
+    @Test
+    void ShouldAddTaskToTheHead() {
+
+        Task t1 = inMemoryTaskManager.getTask(1);
+        Subtask subtask = inMemoryTaskManager.getSubtask(10);
+        Epic epic = inMemoryTaskManager.getEpic(4);
+        Task t2 = inMemoryTaskManager.getTask(1);
+        final Node node = inMemoryTaskManager.getHead();
+        assertEquals(node.data, subtask, "начальный узел не совпадает");
     }
 
 }

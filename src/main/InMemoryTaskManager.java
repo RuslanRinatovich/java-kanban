@@ -1,10 +1,7 @@
 package main;
 
 
-import main.models.Epic;
-import main.models.Status;
-import main.models.Subtask;
-import main.models.Task;
+import main.models.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,11 +11,6 @@ import java.util.Map;
 public class InMemoryTaskManager implements TaskManager {
     private int idTask = 0;
     private final HistoryManager historyManager;
-    // я так не делал, потому что один из ревьюеров написал студентам, что при такой
-    // реализации менеджер истории в оперативной памяти жестко зашивается в менеджер задач.
-    // Стоит использовать подход к инициализации поля через аргумент конструктора, это называется
-    // внедрением зависимости. Я реализовал так. Как лучше то?
-    // private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Map<Integer, Task> taskHashMap = new HashMap<>();
     private final Map<Integer, Epic> epicHashMap = new HashMap<>();
     private final Map<Integer, Subtask> subtaskHashMap = new HashMap<>();
@@ -46,6 +38,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
+    }
+    @Override
+    public Node getTail()
+    {
+        return historyManager.getTail();
+    }
+    @Override
+    public Node getHead()
+    {
+        return historyManager.getHead();
     }
 
     // -----------------------------------------------------------

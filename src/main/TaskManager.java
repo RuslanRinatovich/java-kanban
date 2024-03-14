@@ -1,9 +1,6 @@
 package main;
 
-import main.models.Epic;
-import main.models.Status;
-import main.models.Subtask;
-import main.models.Task;
+import main.models.*;
 
 import java.util.List;
 import java.util.Map;
@@ -93,4 +90,9 @@ public interface TaskManager {
     int getNewId();
 
     int getId();
+
+
+    Node getTail();
+    Node getHead();
+
 }
