@@ -93,6 +93,7 @@ public interface TaskManager {
 
 
     Node getTail();
+
     Node getHead();
 
 }

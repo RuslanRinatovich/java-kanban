@@ -130,6 +130,7 @@ class InMemoryHistoryManagerTest {
         final Node node = inMemoryTaskManager.getTail();
         assertEquals(node.data, t2, "конечный узел не совпадает");
     }
+
     @Test
     void ShouldAddTaskToTheHead() {
 
