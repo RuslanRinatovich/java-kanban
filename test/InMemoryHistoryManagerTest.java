@@ -126,9 +126,10 @@ class InMemoryHistoryManagerTest {
         Task t1 = inMemoryTaskManager.getTask(1);
         Subtask subtask = inMemoryTaskManager.getSubtask(10);
         Epic epic = inMemoryTaskManager.getEpic(4);
-        Task t2 = inMemoryTaskManager.getTask(1);
-        final Node node = inMemoryTaskManager.getTail();
-        assertEquals(node.data, t2, "конечный узел не совпадает");
+        Task expected = inMemoryTaskManager.getTask(1);
+        final List<Task> history = inMemoryTaskManager.getHistory();
+        final Task actual = history.get(2);
+        assertEquals(actual, expected, "конечный узел не совпадает");
     }
 
     @Test
@@ -138,8 +139,9 @@ class InMemoryHistoryManagerTest {
         Subtask subtask = inMemoryTaskManager.getSubtask(10);
         Epic epic = inMemoryTaskManager.getEpic(4);
         Task t2 = inMemoryTaskManager.getTask(1);
-        final Node node = inMemoryTaskManager.getHead();
-        assertEquals(node.data, subtask, "начальный узел не совпадает");
+        final List<Task> history = inMemoryTaskManager.getHistory();
+        final Task actual = history.get(0);
+        assertEquals(actual, subtask, "начальный узел не совпадает");
     }
 
 }

@@ -40,16 +40,6 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    @Override
-    public Node getTail() {
-        return historyManager.getTail();
-    }
-
-    @Override
-    public Node getHead() {
-        return historyManager.getHead();
-    }
-
     // -----------------------------------------------------------
     // Методы для работы с задачами
     public int getId() {
@@ -104,9 +94,7 @@ public class InMemoryTaskManager implements TaskManager {
     // f. Удаление по идентификатору.
     @Override
     public void deleteTask(int id) {
-        if (taskHashMap.containsKey(id)) {
-            taskHashMap.remove(id);
-        }
+        taskHashMap.remove(id);
     }
 
     // g. изменение статуса задачи
@@ -259,7 +247,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epicHashMap.get(id);
             // удаляем подзадачи из subtaskHashMap
             for (int i : epic.getSubtasksIds()) {
-                subtaskHashMap.remove(id);
+                subtaskHashMap.remove(i);
             }
             epicHashMap.remove(id);
         }

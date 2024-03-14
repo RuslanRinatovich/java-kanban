@@ -96,6 +96,4 @@ public class Main {
         System.out.println("3 - Работа с подзадачами");
         System.out.println("4 - Выход");
     }
-
-
 }

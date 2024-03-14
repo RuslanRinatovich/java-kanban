@@ -16,10 +16,13 @@ public interface TaskManager {
 
     // -----------------------------------------------------------
     // Методы для работы с задачами
+    int getNewId();
 
+    int getId();
 
     //  a. Получение списка всех задач.
     List<Task> getTasks();
+
 
     // b. Удаление всех задач.
     void deleteTasks();
@@ -86,11 +89,6 @@ public interface TaskManager {
 
     // метод обновления статуса Эпика
     void updateEpicStatus(Epic epic);
-
-    int getNewId();
-
-    int getId();
-
 
 
 }

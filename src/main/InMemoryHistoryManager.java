@@ -5,7 +5,6 @@ import java.util.*;
 import main.models.Node;
 import main.models.Task;
 
-
 public class InMemoryHistoryManager implements HistoryManager {
 
     private Node head;
@@ -16,18 +15,16 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-
-        if (historyTask.containsKey(task.getId())) {
-            int id = task.getId();
-            removeNode(historyTask.remove(id));
+        int taskId = task.getId();
+        if (historyTask.containsKey(taskId)) {
+            removeNode(historyTask.remove(taskId));
         }
-        historyTask.put(task.getId(), linkLast(task));
+        historyTask.put(taskId, linkLast(task));
     }
-
 
     @Override
     public void remove(int id) {
-        removeNode(historyTask.remove(id));;
+        removeNode(historyTask.remove(id));
     }
 
     @Override
@@ -39,11 +36,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         final Node oldTail = tail;
         final Node newNode = new Node(oldTail, element, null);
-        if (size == 0)
-            head = newNode;
+        if (size == 0) head = newNode;
         tail = newNode;
-        if (oldTail != null)
-            oldTail.next = newNode;
+        if (oldTail != null) oldTail.next = newNode;
         size++;
         return newNode;
     }
