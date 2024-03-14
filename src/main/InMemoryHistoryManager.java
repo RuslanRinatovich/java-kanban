@@ -53,9 +53,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (size == 0)
             head = newNode;
         tail = newNode;
-        if (oldTail == null)
-            tail = newNode;
-        else
+        if (oldTail != null)
             oldTail.next = newNode;
         size++;
         return newNode;
@@ -105,9 +103,4 @@ public class InMemoryHistoryManager implements HistoryManager {
     public int size() {
         return this.size;
     }
-
-
-
-
-
 }
