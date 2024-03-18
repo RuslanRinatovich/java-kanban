@@ -77,6 +77,45 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
+    @Override
+    public Task fromString(String value) {
+        //в качестве результата создает таск определенного типа
+        String[] data = value.split(",");
+        TaskType type = TaskType.valueOf(data[1]);
+        switch (type) {
+            case TASK: {
+                int id = Integer.parseInt(data[0]);
+                String title = data[2];
+                Status status = Status.valueOf(data[3]);
+                String description = data[4];
+                Task task = new Task(title, description, id, status);
+                idTask = id;
+                return task;
+            }
+            case SUBTASK: {
+                int id = Integer.parseInt(data[0]);
+                String title = data[2];
+                Status status = Status.valueOf(data[3]);
+                String description = data[4];
+                int epicId = Integer.parseInt(data[5]);
+                Subtask subtask = new Subtask(title, description, id, status, epicId);
+                idTask = id;
+                return subtask;
+            }
+            case EPIC:
+            {
+                int id = Integer.parseInt(data[0]);
+                String title = data[2];
+                Status status = Status.valueOf(data[3]);
+                String description = data[4];
+                Epic epic = new Epic(title, description, id, status, null);
+                idTask = id;
+                return epic;
+            }
+        }
+        return null;
+    }
+
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     @Override
     public void addTask(Task newTask) {

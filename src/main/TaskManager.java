@@ -29,6 +29,7 @@ public interface TaskManager {
 
     //  c. Получение по идентификатору.
     Task getTask(int id);
+    Task fromString(String value);
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     void addTask(Task newTask);
@@ -53,6 +54,7 @@ public interface TaskManager {
 
     // d. Создание подзадачи. Сам объект должен передаваться в качестве параметра.
     void addSubtask(Subtask newSubtask);
+
 
     //e. Обновление подзадачи. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     void updateSubtask(Subtask newSubtask);
