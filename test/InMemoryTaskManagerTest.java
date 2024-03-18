@@ -60,7 +60,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void addTask() {
+    public void addTask() throws ManagerSaveException {
         int id = inMemoryTaskManager.getId() + 1;
         Task newTask = new Task("Задача 1", "Описание задачи 1", id, Status.NEW);
         inMemoryTaskManager.addTask(newTask);
@@ -69,7 +69,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void updateTask() {
+    public void updateTask() throws ManagerSaveException {
         Task newTask = new Task("Задача 1. Обновленная", "Описание задачи 1", 1, Status.NEW);
         inMemoryTaskManager.updateTask(newTask);
         Task actualTask = inMemoryTaskManager.getTask(1);
@@ -77,27 +77,27 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void deleteTask() {
+    public void deleteTask() throws ManagerSaveException {
         inMemoryTaskManager.deleteTask(1);
         Task expected = inMemoryTaskManager.getTask(1);
         assertNull(expected, "Задача не удалена.");
     }
 
     @Test
-    public void deleteAllSubtasks() {
+    public void deleteAllSubtasks() throws ManagerSaveException {
         inMemoryTaskManager.deleteSubtasks();
         assertEquals(0, inMemoryTaskManager.getSubtaskHashMap().size(), "Подзадачи не очищены");
     }
 
     @Test
-    public void getSubtaskById() {
+    public void getSubtaskById() throws ManagerSaveException {
         Subtask expected = new Subtask("Подзадача 1", "Описание подзадачи 1", 7, Status.NEW, 4);
         Subtask actual = inMemoryTaskManager.getSubtask(7);
         assertEquals(expected, actual, "Подзадачи не совпадают");
     }
 
     @Test
-    public void addSubtask() {
+    public void addSubtask() throws ManagerSaveException {
         int id = inMemoryTaskManager.getId() + 1;
         Subtask newSubtask = new Subtask("Подзадача 7", "Описание подзадачи 7", id, Status.NEW, 4);
         inMemoryTaskManager.addSubtask(newSubtask);
@@ -107,7 +107,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void updateSubtask() {
+    public void updateSubtask() throws ManagerSaveException {
         Subtask newSubtask = new Subtask("Подзадача 1, Обновлена", "Описание подзадачи 7", 7, Status.NEW, 4);
         inMemoryTaskManager.updateSubtask(newSubtask);
         Subtask actualSubtask = inMemoryTaskManager.getSubtask(7);
@@ -115,7 +115,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void deleteSubtask() {
+    public void deleteSubtask() throws ManagerSaveException {
         inMemoryTaskManager.deleteSubtask(7);
         Subtask expected = inMemoryTaskManager.getSubtask(1);
         assertNull(expected, "Подзадача не удалена.");
@@ -132,7 +132,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void addEpic() {
+    public void addEpic() throws ManagerSaveException {
         int id = inMemoryTaskManager.getId() + 1;
         Epic newEpic = new Epic("Эпик 4", "Описание Эпика 4", id, Status.NEW, new ArrayList<>());
         inMemoryTaskManager.addEpic(newEpic);
@@ -141,7 +141,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void updateEpic() {
+    public void updateEpic() throws ManagerSaveException {
         ArrayList<Integer> subtasksIds = new ArrayList<>();
         subtasksIds.add(4);
         subtasksIds.add(5);
@@ -152,7 +152,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void deleteEpic() {
+    public void deleteEpic() throws ManagerSaveException {
         inMemoryTaskManager.deleteEpic(4);
         Epic expected = inMemoryTaskManager.getEpic(4);
         assertNull(expected, "Эпик удален.");

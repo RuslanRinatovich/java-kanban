@@ -1,9 +1,6 @@
 package main;
 
-import main.models.Epic;
-import main.models.Status;
-import main.models.Subtask;
-import main.models.Task;
+import main.models.*;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -13,7 +10,7 @@ public class Main {
     static Scanner scanner;
     public static TaskManager taskManager = Managers.getDefault();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ManagerSaveException {
         scanner = new Scanner(System.in);
         System.out.println("Поехали!");
 
