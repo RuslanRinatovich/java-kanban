@@ -28,7 +28,7 @@ public interface TaskManager {
     void deleteTasks() throws ManagerSaveException;
 
     //  c. Получение по идентификатору.
-    Task getTask(int id);
+    Task getTask(int id) throws ManagerSaveException;
 
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
@@ -50,7 +50,7 @@ public interface TaskManager {
     void deleteSubtasks() throws ManagerSaveException;
 
     //  c. Получение подзадачи по идентификатору.
-    Subtask getSubtask(int id);
+    Subtask getSubtask(int id) throws ManagerSaveException;
 
     // d. Создание подзадачи. Сам объект должен передаваться в качестве параметра.
     void addSubtask(Subtask newSubtask) throws ManagerSaveException;
@@ -76,7 +76,7 @@ public interface TaskManager {
     void deleteEpics() throws ManagerSaveException;
 
     //  c. Получение по идентификатору.
-    Epic getEpic(int id);
+    Epic getEpic(int id) throws ManagerSaveException;
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     void addEpic(Epic newEpic) throws ManagerSaveException;

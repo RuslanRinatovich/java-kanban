@@ -59,7 +59,7 @@ public class CSVTaskFormatter {
     static String makeDataToSave(List<Task> tasks, HistoryManager historyManager) {
 
         StringBuilder history = new StringBuilder();
-        history.append("id,type,name,status,description,epic");
+        history.append("id,type,name,status,description,epic or subtasks\n");
 
         for (var task : tasks) {
             history.append(task.toStringForFile()).append("\n");
@@ -72,8 +72,14 @@ public class CSVTaskFormatter {
     // Возвращает строку из id задач через запятую, которые есть в истории
     static String historyToString(HistoryManager manager) {
         String result = "";
+        int i = 0;
         for (var task : manager.getHistory()) {
-            result = result + "," + task.getId();
+            if (i == 0) {
+                result = result + task.getId();
+            } else {
+                result = result + "," + task.getId();
+            }
+            i++;
         }
         return result;
     }

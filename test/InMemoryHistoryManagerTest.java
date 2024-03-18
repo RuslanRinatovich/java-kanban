@@ -51,7 +51,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void add() {
+    void add() throws ManagerSaveException  {
         Task t = inMemoryTaskManager.getTask(1);
         final List<Task> history = inMemoryTaskManager.getHistory();
         assertNotNull(history, "История не пустая.");
@@ -59,7 +59,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void ShouldHistorySizeBeTheSameBecauseTheTaskHasSameId() {
+    void ShouldHistorySizeBeTheSameBecauseTheTaskHasSameId() throws ManagerSaveException  {
         Task t = inMemoryTaskManager.getTask(2);
         for (int i = 0; i < 9; i++) {
             t = inMemoryTaskManager.getTask(1);
@@ -71,7 +71,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void CheckIfHistoryContainsTasksSubtasksAndEpics() {
+    void CheckIfHistoryContainsTasksSubtasksAndEpics() throws ManagerSaveException {
         Task t = inMemoryTaskManager.getTask(1);
         Subtask subtask = inMemoryTaskManager.getSubtask(10);
         Epic epic = inMemoryTaskManager.getEpic(4);
@@ -98,7 +98,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void CheckIfHistoryDontHasNewTaskWhenTheTaskHasSameId() {
+    void CheckIfHistoryDontHasNewTaskWhenTheTaskHasSameId() throws ManagerSaveException  {
 
         Task t1 = inMemoryTaskManager.getTask(1);
         Task t2 = inMemoryTaskManager.getTask(1);
@@ -109,7 +109,7 @@ class InMemoryHistoryManagerTest {
 
 
     @Test
-    void CheckIfHistoryDontAddNewTaskWhenTheTaskHasSameId() {
+    void CheckIfHistoryDontAddNewTaskWhenTheTaskHasSameId() throws ManagerSaveException  {
 
         Task t1 = inMemoryTaskManager.getTask(1);
         Subtask subtask = inMemoryTaskManager.getSubtask(10);
@@ -121,7 +121,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void ShouldAddTaskToTheTail() {
+    void ShouldAddTaskToTheTail() throws ManagerSaveException {
 
         Task t1 = inMemoryTaskManager.getTask(1);
         Subtask subtask = inMemoryTaskManager.getSubtask(10);
@@ -133,7 +133,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void ShouldAddTaskToTheHead() {
+    void ShouldAddTaskToTheHead()  throws ManagerSaveException {
 
         Task t1 = inMemoryTaskManager.getTask(1);
         Subtask subtask = inMemoryTaskManager.getSubtask(10);

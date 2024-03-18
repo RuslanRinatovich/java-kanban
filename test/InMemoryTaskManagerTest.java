@@ -53,7 +53,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void getTaskById() {
+    public void getTaskById() throws ManagerSaveException  {
         Task expected = new Task(1, "Задача 1", "Описание задачи 1", Status.NEW);
         Task actual = inMemoryTaskManager.getTask(1);
         assertEquals(expected, actual, "Задачи не совпадают");
@@ -122,7 +122,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void getEpicById() {
+    public void getEpicById() throws ManagerSaveException {
         ArrayList<Integer> subtasksIds = new ArrayList<>();
         subtasksIds.add(4);
         subtasksIds.add(5);

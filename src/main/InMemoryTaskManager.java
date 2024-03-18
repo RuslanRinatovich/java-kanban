@@ -63,7 +63,7 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override
-    public Task getTask(int id) {
+    public Task getTask(int id) throws ManagerSaveException {
         if (taskHashMap.containsKey(id)) {
             Task task = taskHashMap.get(id);
             Task clonedTaskFoHistory = new Task(task.getId(), task.getTitle(), task.getDescription(),  task.getStatus());
@@ -126,7 +126,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     //  c. Получение подзадачи по идентификатору.
     @Override
-    public Subtask getSubtask(int id) {
+    public Subtask getSubtask(int id) throws ManagerSaveException{
 
         if (subtaskHashMap.containsKey(id)) {
             Subtask subtask = subtaskHashMap.get(id);
@@ -214,7 +214,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     //  c. Получение по идентификатору.
     @Override
-    public Epic getEpic(int id) {
+    public Epic getEpic(int id) throws ManagerSaveException {
         if (epicHashMap.containsKey(id)) {
             Epic epic = epicHashMap.get(id);
             Epic clonedTaskFoHistory = new Epic(epic.getId(), epic.getTitle(), epic.getDescription(), epic.getStatus(), epic.getSubtasksIds());
