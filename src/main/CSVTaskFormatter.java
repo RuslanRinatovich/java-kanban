@@ -22,8 +22,7 @@ public class CSVTaskFormatter {
             FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file);
             int size = lines.length;
 
-           for(int i=1; i < size - 2; i++)
-           {
+            for (int i = 1; i < size - 2; i++) {
                 var task = fromString(lines[i]);
                 if (task instanceof Epic) {
                     fileBackedTaskManager.addEpic((Epic) task);

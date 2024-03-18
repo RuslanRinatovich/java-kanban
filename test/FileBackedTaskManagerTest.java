@@ -19,7 +19,7 @@ public class FileBackedTaskManagerTest {
     private static TaskManager fileBackedTaskManager;
 
 
-//    @BeforeEach
+    //    @BeforeEach
 //    public void setUp() throws ManagerSaveException {
 //
 //        fileBackedTaskManager = Managers.getDefault();
@@ -56,12 +56,12 @@ public class FileBackedTaskManagerTest {
     @BeforeEach
     public void setUp() throws ManagerSaveException {
         fileBackedTaskManager = Managers.getDefault();
-        Task task1 = new Task("Задача 1", "Описание задачи 1",  Status.NEW);
+        Task task1 = new Task("Задача 1", "Описание задачи 1", Status.NEW);
         fileBackedTaskManager.addTask(task1); //1
         Epic epic1 = new Epic("Эпик 1", "Описание Эпика 1", Status.NEW, new ArrayList<>());
         fileBackedTaskManager.addEpic(epic1);//2
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1",  Status.NEW, epic1.getId());
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2",  Status.NEW, epic1.getId());
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", Status.NEW, epic1.getId());
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", Status.NEW, epic1.getId());
         fileBackedTaskManager.addSubtask(subtask1);//3
         fileBackedTaskManager.addSubtask(subtask2);//4
     }
@@ -69,12 +69,12 @@ public class FileBackedTaskManagerTest {
     @Test
     public void saveSeveralTasksToTestFile() throws IOException {
         TaskManager fileBackedTaskManager1 = new FileBackedTaskManager(new InMemoryHistoryManager(), new File("test.csv"));
-        Task task1 = new Task("Задача 1", "Описание задачи 1",  Status.NEW);
+        Task task1 = new Task("Задача 1", "Описание задачи 1", Status.NEW);
         fileBackedTaskManager1.addTask(task1); //1
         Epic epic1 = new Epic("Эпик 1", "Описание Эпика 1", Status.NEW, new ArrayList<>());
         fileBackedTaskManager1.addEpic(epic1);//2
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1",  Status.NEW, epic1.getId());
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2",  Status.NEW, epic1.getId());
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", Status.NEW, epic1.getId());
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", Status.NEW, epic1.getId());
         fileBackedTaskManager1.addSubtask(subtask1);//3
         fileBackedTaskManager1.addSubtask(subtask2);//4
         Task actual = fileBackedTaskManager1.getTask(1);
@@ -88,12 +88,12 @@ public class FileBackedTaskManagerTest {
     @Test
     public void saveSeveralTasksToTestFileWithoutHistory() throws IOException {
         TaskManager fileBackedTaskManager1 = new FileBackedTaskManager(new InMemoryHistoryManager(), new File("test.csv"));
-        Task task1 = new Task("Задача 1", "Описание задачи 1",  Status.NEW);
+        Task task1 = new Task("Задача 1", "Описание задачи 1", Status.NEW);
         fileBackedTaskManager1.addTask(task1); //1
         Epic epic1 = new Epic("Эпик 1", "Описание Эпика 1", Status.NEW, new ArrayList<>());
         fileBackedTaskManager1.addEpic(epic1);//2
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1",  Status.NEW, epic1.getId());
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2",  Status.NEW, epic1.getId());
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", Status.NEW, epic1.getId());
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", Status.NEW, epic1.getId());
         fileBackedTaskManager1.addSubtask(subtask1);//3
         fileBackedTaskManager1.addSubtask(subtask2);//4
         TaskManager loadedFromFileBackedTaskManager = loadFromFile(new File("test.csv"));
@@ -103,13 +103,11 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void saveEmptyFile() throws ManagerSaveException {
-        try{
+        try {
             TaskManager fileBackedTaskManager1 = new FileBackedTaskManager(new InMemoryHistoryManager(), new File("test2.csv"));
             TaskManager loadedFromFileBackedTaskManager = loadFromFile(new File("test2.csv"));
-        }
-        catch (ManagerSaveException e)
-        {
-           assertEquals(e.getMessage(), "Ошибка работы с файлом");
+        } catch (ManagerSaveException e) {
+            assertEquals(e.getMessage(), "Ошибка работы с файлом");
         }
 
     }
@@ -134,7 +132,7 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void updateTask() throws ManagerSaveException {
-        Task newTask = new Task(1, "Задача 1. Обновленная", "Описание задачи 1",  Status.NEW);
+        Task newTask = new Task(1, "Задача 1. Обновленная", "Описание задачи 1", Status.NEW);
         fileBackedTaskManager.updateTask(newTask);
         Task actualTask = fileBackedTaskManager.getTask(1);
         assertEquals(newTask, actualTask, "Задачи не совпадают");
@@ -155,7 +153,7 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void getSubtaskById() throws ManagerSaveException {
-        Subtask expected = new Subtask(7,"Подзадача 1", "Описание подзадачи 1",  Status.NEW, 4);
+        Subtask expected = new Subtask(7, "Подзадача 1", "Описание подзадачи 1", Status.NEW, 4);
         Subtask actual = fileBackedTaskManager.getSubtask(7);
         assertEquals(expected, actual, "Подзадачи не совпадают");
     }
@@ -163,7 +161,7 @@ public class FileBackedTaskManagerTest {
     @Test
     public void addSubtask() throws ManagerSaveException {
         int id = fileBackedTaskManager.getId() + 1;
-        Subtask newSubtask = new Subtask(id,"Подзадача 7", "Описание подзадачи 7",  Status.NEW, 4);
+        Subtask newSubtask = new Subtask(id, "Подзадача 7", "Описание подзадачи 7", Status.NEW, 4);
         fileBackedTaskManager.addSubtask(newSubtask);
         Subtask actualSubtask = fileBackedTaskManager.getSubtask(fileBackedTaskManager.getId());
         assertEquals(newSubtask, actualSubtask, "Задачи не совпадают");
@@ -172,7 +170,7 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void updateSubtask() throws ManagerSaveException {
-        Subtask newSubtask = new Subtask(7,"Подзадача 1, Обновлена", "Описание подзадачи 7",  Status.NEW, 4);
+        Subtask newSubtask = new Subtask(7, "Подзадача 1, Обновлена", "Описание подзадачи 7", Status.NEW, 4);
         fileBackedTaskManager.updateSubtask(newSubtask);
         Subtask actualSubtask = fileBackedTaskManager.getSubtask(7);
         assertEquals(newSubtask, actualSubtask, "Задачи не совпадают");
@@ -190,7 +188,7 @@ public class FileBackedTaskManagerTest {
         ArrayList<Integer> subtasksIds = new ArrayList<>();
         subtasksIds.add(4);
         subtasksIds.add(5);
-        Epic expected = new Epic(4,"Эпик 1", "Описание Эпика 1",  Status.NEW, subtasksIds);
+        Epic expected = new Epic(4, "Эпик 1", "Описание Эпика 1", Status.NEW, subtasksIds);
         Epic actual = fileBackedTaskManager.getEpic(4);
         assertEquals(expected, actual, "Эпики не совпадают");
     }
@@ -198,7 +196,7 @@ public class FileBackedTaskManagerTest {
     @Test
     public void addEpic() throws ManagerSaveException {
         int id = fileBackedTaskManager.getId() + 1;
-        Epic newEpic = new Epic( id,"Эпик 4", "Описание Эпика 4", Status.NEW, new ArrayList<>());
+        Epic newEpic = new Epic(id, "Эпик 4", "Описание Эпика 4", Status.NEW, new ArrayList<>());
         fileBackedTaskManager.addEpic(newEpic);
         Epic actualEpic = fileBackedTaskManager.getEpic(fileBackedTaskManager.getId());
         assertEquals(newEpic, actualEpic, "Эпики не совпадают");
@@ -209,7 +207,7 @@ public class FileBackedTaskManagerTest {
         ArrayList<Integer> subtasksIds = new ArrayList<>();
         subtasksIds.add(4);
         subtasksIds.add(5);
-        Epic newEpic = new Epic(4,"Эпик 1. Обновлен", "Описание Эпика 1",  Status.NEW, subtasksIds);
+        Epic newEpic = new Epic(4, "Эпик 1. Обновлен", "Описание Эпика 1", Status.NEW, subtasksIds);
         fileBackedTaskManager.updateEpic(newEpic);
         Epic actualEpic = fileBackedTaskManager.getEpic(4);
         assertEquals(newEpic, actualEpic, "Эпики не совпадают");

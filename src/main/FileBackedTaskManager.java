@@ -35,7 +35,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             tasks.addAll(getEpics());
             wr.write(makeDataToSave(tasks, this.historyManager));
         } catch (IOException e) {
-           throw new ManagerSaveException("Ошибка работы с файлом", e);
+            throw new ManagerSaveException("Ошибка работы с файлом", e);
         }
     }
 
