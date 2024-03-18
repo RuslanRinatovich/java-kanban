@@ -12,6 +12,5 @@ public interface HistoryManager {
 
     List<Task> getHistory();
 
-    String getIdOfTasks();
 
 }

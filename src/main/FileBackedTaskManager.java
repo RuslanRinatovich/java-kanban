@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static main.CSVTaskFormatter.historyToString;
+import static main.CSVTaskFormatter.makeDataToSave;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -26,15 +27,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         autoSaveFileName = filename;
     }
 
-
-
     public void save() throws ManagerSaveException {
         try (BufferedWriter wr = new BufferedWriter(new FileWriter(autoSaveFileName, StandardCharsets.UTF_8))) {
             List<Task> tasks = new ArrayList<>();
             tasks.addAll(getTasks());
             tasks.addAll(getSubtasks());
             tasks.addAll(getEpics());
-            wr.write(historyToString(tasks, this.historyManager));
+            wr.write(makeDataToSave(tasks, this.historyManager));
         } catch (IOException e) {
            throw new ManagerSaveException("Ошибка работы с файлом", e);
         }

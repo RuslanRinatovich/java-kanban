@@ -17,7 +17,7 @@ class InMemoryHistoryManagerTest {
     private static HistoryManager historyManager;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws ManagerSaveException {
         inMemoryTaskManager = Managers.getDefault();
 
         Task task1 = new Task("Задача 1", "Описание задачи 1", 0, Status.NEW);

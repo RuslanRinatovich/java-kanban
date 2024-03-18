@@ -6,8 +6,13 @@ import java.util.List;
 
 public class CSVTaskFormatter {
 
+    static FileBackedTaskManager loadFromFile(File file)
+    {
 
-    static String historyToString(List<Task> tasks, HistoryManager historyManager) {
+    }
+
+    static String makeDataToSave(List<Task> tasks, HistoryManager historyManager) {
+
         StringBuilder history = new StringBuilder();
         history.append("id,type,name,status,description,epic");
 
@@ -15,9 +20,26 @@ public class CSVTaskFormatter {
             history.append(task.toStringForFile()).append("\n");
         }
         history.append("\n");
-        history.append(historyManager.getIdOfTasks());
+        history.append(historyToString(historyManager));
         return history.toString();
     }
+
+
+    static String historyToString(HistoryManager manager){
+        String result = "";
+        for (var task: manager.getHistory()) {
+            result =result +"," + task.getId();
+        }
+        return result;
+    }
+
+    static List<Integer> historyFromString(String value)
+    {
+
+
+    }
+
+
     public Task fromString(String value) {
         //в качестве результата создает таск определенного типа
         String[] data = value.split(",");
