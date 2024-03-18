@@ -6,23 +6,49 @@ import main.models.Status;
 import main.models.Subtask;
 import main.models.Task;
 
-public class FileBackedTaskManager extends InMemoryTaskManager  {
-    private String autoSaveFileName = new String();
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class FileBackedTaskManager extends InMemoryTaskManager {
+
+    private final String autoSaveFileName;
+
     public FileBackedTaskManager(HistoryManager historyManager, String filename) {
         super(historyManager);
         autoSaveFileName = filename;
     }
 
-    public void save()
-    {
-        //pass
+    static String historyToString(HistoryManager manager) {
+        StringBuilder history = new StringBuilder();
+        history.append("id,type,name,status,description,epic");
+        for (var task : manager.getHistory()) {
+            history.append(task.toStringForFile() + "\n");
+        }
+        return history.toString();
+    }
+
+    public void save() {
+        try (BufferedWriter wr = new BufferedWriter(new FileWriter(autoSaveFileName, StandardCharsets.UTF_8))) {
+            wr.write(historyToString(this.historyManager));
+        } catch (IOException e) {
+            System.out.println("Произошла ошибка во время записи файла.");
+        }
     }
 
     @Override
-    public void deleteTasks(){
+    public void deleteTasks() {
         super.deleteTasks();
         save();
     }
+
     @Override
     public void addTask(Task newTask) {
         super.addTask(newTask);
@@ -48,7 +74,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager  {
     }
 
     @Override
-    public void deleteSubtasks(){
+    public void deleteSubtasks() {
         super.deleteSubtasks();
         save();
     }
@@ -58,11 +84,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager  {
         super.addTask(newSubtask);
         save();
     }
+
     @Override
     public void updateSubtask(Subtask newSubtask) {
         super.updateSubtask(newSubtask);
         save();
     }
+
     @Override
     public void deleteSubtask(int id) {
         super.deleteSubtask(id);
@@ -70,13 +98,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager  {
     }
 
     @Override
-    public void  changeSubtaskStatus(Subtask subtask, Status status){
+    public void changeSubtaskStatus(Subtask subtask, Status status) {
         super.changeSubtaskStatus(subtask, status);
         save();
     }
 
     @Override
-    public void deleteEpics(){
+    public void deleteEpics() {
         super.deleteEpics();
         save();
     }
@@ -86,6 +114,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager  {
         super.addEpic(newEpic);
         save();
     }
+
     @Override
     public void updateEpic(Epic newEpic) {
         super.updateEpic(newEpic);
@@ -105,7 +134,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager  {
     }
 
     @Override
-    public void updateEpicStatus(Epic epic){
+    public void updateEpicStatus(Epic epic) {
         super.updateEpicStatus(epic);
         save();
     }
