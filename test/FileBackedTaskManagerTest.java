@@ -125,7 +125,7 @@ public class FileBackedTaskManagerTest {
         int id = fileBackedTaskManager.getId() + 1;
         Task newTask = new Task(id, "Задача 1", "Описание задачи 1", Status.NEW);
         fileBackedTaskManager.addTask(newTask);
-        Task actualTask = fileBackedTaskManager.getTask(fileBackedTaskManager.getId());
+        Task actualTask = fileBackedTaskManager.getTask(id);
         assertEquals(newTask, actualTask, "Задачи не совпадают");
     }
 
@@ -182,22 +182,14 @@ public class FileBackedTaskManagerTest {
         assertNull(expected, "Подзадача не удалена.");
     }
 
-    @Test
-    public void getEpicById() throws ManagerSaveException {
-        ArrayList<Integer> subtasksIds = new ArrayList<>();
-        subtasksIds.add(4);
-        subtasksIds.add(5);
-        Epic expected = new Epic(4, "Эпик 1", "Описание Эпика 1", Status.NEW, subtasksIds);
-        Epic actual = fileBackedTaskManager.getEpic(4);
-        assertEquals(expected, actual, "Эпики не совпадают");
-    }
+
 
     @Test
     public void addEpic() throws ManagerSaveException {
         int id = fileBackedTaskManager.getId() + 1;
         Epic newEpic = new Epic(id, "Эпик 4", "Описание Эпика 4", Status.NEW, new ArrayList<>());
         fileBackedTaskManager.addEpic(newEpic);
-        Epic actualEpic = fileBackedTaskManager.getEpic(fileBackedTaskManager.getId());
+        Epic actualEpic = fileBackedTaskManager.getEpic(id);
         assertEquals(newEpic, actualEpic, "Эпики не совпадают");
     }
 

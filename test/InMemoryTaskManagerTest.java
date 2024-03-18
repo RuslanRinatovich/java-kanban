@@ -14,7 +14,7 @@ class InMemoryTaskManagerTest {
 
     @BeforeEach
     public void setUp() throws ManagerSaveException {
-        inMemoryTaskManager = Managers.getDefault();
+        inMemoryTaskManager = Managers.getDefaultInMemory();
 
         Task task1 = new Task("Задача 1", "Описание задачи 1",  Status.NEW);
         Task task2 = new Task("Задача 2", "Описание задачи 2",  Status.NEW);
@@ -64,7 +64,7 @@ class InMemoryTaskManagerTest {
         int id = inMemoryTaskManager.getId() + 1;
         Task newTask = new Task(id, "Задача 1", "Описание задачи 1", Status.NEW);
         inMemoryTaskManager.addTask(newTask);
-        Task actualTask = inMemoryTaskManager.getTask(inMemoryTaskManager.getId());
+        Task actualTask = inMemoryTaskManager.getTask(id);
         assertEquals(newTask, actualTask, "Задачи не совпадают");
     }
 
@@ -101,7 +101,7 @@ class InMemoryTaskManagerTest {
         int id = inMemoryTaskManager.getId() + 1;
         Subtask newSubtask = new Subtask(id,"Подзадача 7", "Описание подзадачи 7",  Status.NEW, 4);
         inMemoryTaskManager.addSubtask(newSubtask);
-        Subtask actualSubtask = inMemoryTaskManager.getSubtask(inMemoryTaskManager.getId());
+        Subtask actualSubtask = inMemoryTaskManager.getSubtask(id);
         assertEquals(newSubtask, actualSubtask, "Задачи не совпадают");
 
     }
@@ -134,9 +134,9 @@ class InMemoryTaskManagerTest {
     @Test
     public void addEpic() throws ManagerSaveException {
         int id = inMemoryTaskManager.getId() + 1;
-        Epic newEpic = new Epic( id,"Эпик 4", "Описание Эпика 4", Status.NEW, new ArrayList<>());
+        Epic newEpic = new Epic(id,"Эпик 4", "Описание Эпика 4", Status.NEW, new ArrayList<>());
         inMemoryTaskManager.addEpic(newEpic);
-        Epic actualEpic = inMemoryTaskManager.getEpic(inMemoryTaskManager.getId());
+        Epic actualEpic = inMemoryTaskManager.getEpic(id);
         assertEquals(newEpic, actualEpic, "Эпики не совпадают");
     }
 
