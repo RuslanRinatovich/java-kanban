@@ -4,17 +4,13 @@ public class Subtask extends Task {
 
     private int epicId;
 
-    public Subtask(int id, String title, String description,  Status status, int epicId) {
-        super(id, title, description,  status);
+    public Subtask(int id, String title, String description, Status status, int epicId) {
+        super(id, title, description, status);
         this.epicId = epicId;
     }
 
     public Subtask(String title, String description, Status status, int epicId) {
-        super(title, description,  status);
-        this.epicId = epicId;
-    }
-
-    public void setEpicId(int epicId) {
+        super(title, description, status);
         this.epicId = epicId;
     }
 
@@ -22,7 +18,9 @@ public class Subtask extends Task {
         return epicId;
     }
 
-
+    public void setEpicId(int epicId) {
+        this.epicId = epicId;
+    }
 
     @Override
     public String toString() {
@@ -36,7 +34,7 @@ public class Subtask extends Task {
     }
 
     @Override
-    public String toStringForFile(){
+    public String toStringForFile() {
         return String.format("%d,SUBTASK,%s,%s,%s,%d", id, title, status, description, epicId);
     }
 }
