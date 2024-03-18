@@ -18,8 +18,10 @@ public class Epic extends Task {
 
     private String getSubtasks() {
         String result = "";
-        for (int i: subtasksIds             ) {
-            result = result + i + " ";
+        if (subtasksIds != null) {
+            for (int i : subtasksIds) {
+                result = result + i + " ";
+            }
         }
         return result;
     }

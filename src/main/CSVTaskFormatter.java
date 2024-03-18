@@ -13,39 +13,37 @@ import static main.Managers.getDefaultHistory;
 public class CSVTaskFormatter {
 
     // генерация FileBackedTaskManager из файла
-    static FileBackedTaskManager loadFromFile(File file) throws ManagerSaveException {
+    public static FileBackedTaskManager loadFromFile(File file) throws ManagerSaveException {
         try {
             // считываем целиком текст из файла в строковую переменную
             String data = Files.readString(file.toPath());
             // создаем на основе файла массив строк
             String[] lines = data.split("\n");
-            FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), "tasks.csv");
-            int index = -1;
-            for (String line : lines) {
-                // если строка пустая, значит мы завершили чтение тасков
-                index++;
-                if (line.isEmpty() || line.isBlank()) {
-                    continue;
-                }
-                var task = fromString(line);
-                if (task instanceof Task) {
-                    fileBackedTaskManager.addTask(task);
-                }
+            FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file);
+            int size = lines.length;
+
+           for(int i=1; i < size - 2; i++)
+           {
+                var task = fromString(lines[i]);
                 if (task instanceof Epic) {
                     fileBackedTaskManager.addEpic((Epic) task);
-                }
-                if (task instanceof Subtask) {
+                } else if (task instanceof Subtask) {
                     fileBackedTaskManager.addSubtask((Subtask) task);
+                } else {
+                    fileBackedTaskManager.addTask(task);
                 }
             }
-            index++;
-            for (int idTask : historyFromString(lines[index])) {
-                if (fileBackedTaskManager.getTaskHashMap().containsKey(idTask))
-                    fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getTask(idTask));
-                if (fileBackedTaskManager.getSubtaskHashMap().containsKey(idTask))
-                    fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getSubtask(idTask));
-                if (fileBackedTaskManager.getEpicHashMap().containsKey(idTask))
-                    fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getEpic(idTask));
+
+            List<Integer> history = historyFromString(lines[size - 1]);
+            if (!history.isEmpty()) {
+                for (int idTask : history) {
+                    if (fileBackedTaskManager.getTaskHashMap().containsKey(idTask))
+                        fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getTask(idTask));
+                    if (fileBackedTaskManager.getSubtaskHashMap().containsKey(idTask))
+                        fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getSubtask(idTask));
+                    if (fileBackedTaskManager.getEpicHashMap().containsKey(idTask))
+                        fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getEpic(idTask));
+                }
             }
             return fileBackedTaskManager;
         } catch (IOException e) {
@@ -65,7 +63,11 @@ public class CSVTaskFormatter {
             history.append(task.toStringForFile()).append("\n");
         }
         history.append("\n");
-        history.append(historyToString(historyManager));
+        if (historyManager.getHistory().isEmpty())
+            history.append("empty history");
+        else {
+            history.append(historyToString(historyManager));
+        }
         return history.toString();
     }
 
@@ -85,8 +87,10 @@ public class CSVTaskFormatter {
     }
 
     static List<Integer> historyFromString(String value) {
-        String[] historyIds = value.split(",");
         List<Integer> result = new ArrayList<>();
+        if (value.equals("empty history"))
+            return result;
+        String[] historyIds = value.split(",");
         for (String id : historyIds) {
             result.add(Integer.parseInt(id));
         }
@@ -120,6 +124,7 @@ public class CSVTaskFormatter {
                 String title = data[2];
                 Status status = Status.valueOf(data[3]);
                 String description = data[4];
+
                 return new Epic(id, title, description, status, null);
             }
         }

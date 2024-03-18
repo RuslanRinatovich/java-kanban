@@ -20,11 +20,11 @@ import static main.CSVTaskFormatter.makeDataToSave;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private final String autoSaveFileName;
+    private final File autoSaveFileName;
 
-    public FileBackedTaskManager(HistoryManager historyManager, String filename) {
+    public FileBackedTaskManager(HistoryManager historyManager, File file) {
         super(historyManager);
-        autoSaveFileName = filename;
+        autoSaveFileName = file;
     }
 
     public void save() throws ManagerSaveException {

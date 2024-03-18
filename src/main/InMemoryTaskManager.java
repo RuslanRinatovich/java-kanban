@@ -55,6 +55,8 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<Task>(taskHashMap.values());
     }
 
+
+
     // b. Удаление всех задач.
     @Override
     public void deleteTasks() throws ManagerSaveException {
@@ -148,11 +150,11 @@ public class InMemoryTaskManager implements TaskManager {
         subtaskHashMap.put(id, newSubtask);
 
         Epic epic = epicHashMap.getOrDefault(newSubtask.getEpicId(), null);
-        if (epic == null) {
-            epic = new Epic("","", Status.NEW, null);
+        if (epic != null) {
+            epic.addSubtaskId(id);
+            updateEpicStatus(epic);
         }
-        epic.addSubtaskId(id);
-        updateEpicStatus(epic);
+
     }
 
     //e. Обновление подзадачи. Новая версия объекта с верным идентификатором передаётся в виде параметра.
