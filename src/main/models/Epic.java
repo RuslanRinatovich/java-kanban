@@ -47,4 +47,9 @@ public class Epic extends Task {
                 ", status=" + status +
                 '}';
     }
+
+    @Override
+    public String toStringForFile(){
+        return String.format("%d,EPIC,%s,%s,%s,", id, title, status, description);
+    }
 }

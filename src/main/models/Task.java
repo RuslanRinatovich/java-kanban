@@ -69,4 +69,8 @@ public class Task {
                 ", status=" + status +
                 '}';
     }
+
+    public String toStringForFile(){
+        return String.format("%d,TASK,%s,%s,%s,", id, title, status, description);
+    }
 }

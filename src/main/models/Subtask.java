@@ -17,6 +17,8 @@ public class Subtask extends Task {
         return epicId;
     }
 
+
+
     @Override
     public String toString() {
         return "main.models.Subtask{" +
@@ -26,5 +28,10 @@ public class Subtask extends Task {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
+    }
+
+    @Override
+    public String toStringForFile(){
+        return String.format("%d,SUBTASK,%s,%s,%s,", id, title, status, description, epicId);
     }
 }
