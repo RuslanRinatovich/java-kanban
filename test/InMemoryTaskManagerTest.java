@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class InMemoryTaskManagerTest {
 
     private static TaskManager inMemoryTaskManager;
+
     @BeforeEach
     public void setUp() {
         inMemoryTaskManager = Managers.getDefault();
@@ -47,6 +48,7 @@ class InMemoryTaskManagerTest {
         inMemoryTaskManager.addSubtask(subtask5);//11
         inMemoryTaskManager.addSubtask(subtask6);//12
     }
+
     @Test
     public void getNewId() {
         int id = inMemoryTaskManager.getNewId();
@@ -57,7 +59,7 @@ class InMemoryTaskManagerTest {
     public void getTaskById() {
         Task expected = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
         Task actual = inMemoryTaskManager.getTask(1);
-        assertEquals(expected,actual, "Задачи не совпадают");
+        assertEquals(expected, actual, "Задачи не совпадают");
     }
 
     @Test
@@ -85,16 +87,16 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public  void deleteAllSubtasks() {
+    public void deleteAllSubtasks() {
         inMemoryTaskManager.deleteSubtasks();
-        assertEquals(0,inMemoryTaskManager.getSubtaskHashMap().size(),"Подзадачи не очищены");
+        assertEquals(0, inMemoryTaskManager.getSubtaskHashMap().size(), "Подзадачи не очищены");
     }
 
     @Test
     public void getSubtaskById() {
         Subtask expected = new Subtask("Подзадача 1", "Описание подзадачи 1", 7, Status.NEW, 4);
         Subtask actual = inMemoryTaskManager.getSubtask(7);
-        assertEquals(expected,actual, "Подзадачи не совпадают");
+        assertEquals(expected, actual, "Подзадачи не совпадают");
     }
 
     @Test
@@ -102,14 +104,14 @@ class InMemoryTaskManagerTest {
         int id = inMemoryTaskManager.getId() + 1;
         Subtask newSubtask = new Subtask("Подзадача 7", "Описание подзадачи 7", id, Status.NEW, 4);
         inMemoryTaskManager.addSubtask(newSubtask);
-        Subtask actualSubtask= inMemoryTaskManager.getSubtask(inMemoryTaskManager.getId());
+        Subtask actualSubtask = inMemoryTaskManager.getSubtask(inMemoryTaskManager.getId());
         assertEquals(newSubtask, actualSubtask, "Задачи не совпадают");
 
     }
 
     @Test
     public void updateSubtask() {
-        Subtask newSubtask =  new Subtask("Подзадача 1, Обновлена", "Описание подзадачи 7", 7, Status.NEW, 4);
+        Subtask newSubtask = new Subtask("Подзадача 1, Обновлена", "Описание подзадачи 7", 7, Status.NEW, 4);
         inMemoryTaskManager.updateSubtask(newSubtask);
         Subtask actualSubtask = inMemoryTaskManager.getSubtask(7);
         assertEquals(newSubtask, actualSubtask, "Задачи не совпадают");
@@ -127,9 +129,9 @@ class InMemoryTaskManagerTest {
         ArrayList<Integer> subtasksIds = new ArrayList<>();
         subtasksIds.add(4);
         subtasksIds.add(5);
-        Epic expected =  new Epic("Эпик 1", "Описание Эпика 1", 4, Status.NEW, subtasksIds);
+        Epic expected = new Epic("Эпик 1", "Описание Эпика 1", 4, Status.NEW, subtasksIds);
         Epic actual = inMemoryTaskManager.getEpic(4);
-        assertEquals(expected,actual, "Эпики не совпадают");
+        assertEquals(expected, actual, "Эпики не совпадают");
     }
 
     @Test
@@ -137,7 +139,7 @@ class InMemoryTaskManagerTest {
         int id = inMemoryTaskManager.getId() + 1;
         Epic newEpic = new Epic("Эпик 4", "Описание Эпика 4", id, Status.NEW, new ArrayList<>());
         inMemoryTaskManager.addEpic(newEpic);
-        Epic actualEpic= inMemoryTaskManager.getEpic(inMemoryTaskManager.getId());
+        Epic actualEpic = inMemoryTaskManager.getEpic(inMemoryTaskManager.getId());
         assertEquals(newEpic, actualEpic, "Эпики не совпадают");
     }
 
@@ -146,7 +148,7 @@ class InMemoryTaskManagerTest {
         ArrayList<Integer> subtasksIds = new ArrayList<>();
         subtasksIds.add(4);
         subtasksIds.add(5);
-        Epic newEpic =  new Epic("Эпик 1. Обновлен", "Описание Эпика 1", 4, Status.NEW, subtasksIds);
+        Epic newEpic = new Epic("Эпик 1. Обновлен", "Описание Эпика 1", 4, Status.NEW, subtasksIds);
         inMemoryTaskManager.updateEpic(newEpic);
         Epic actualEpic = inMemoryTaskManager.getEpic(4);
         assertEquals(newEpic, actualEpic, "Эпики не совпадают");

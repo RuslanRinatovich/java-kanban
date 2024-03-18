@@ -1,9 +1,6 @@
 package main;
 
-import main.models.Epic;
-import main.models.Status;
-import main.models.Subtask;
-import main.models.Task;
+import main.models.*;
 
 import java.util.List;
 import java.util.Map;
@@ -19,10 +16,13 @@ public interface TaskManager {
 
     // -----------------------------------------------------------
     // Методы для работы с задачами
+    int getNewId();
 
+    int getId();
 
     //  a. Получение списка всех задач.
     List<Task> getTasks();
+
 
     // b. Удаление всех задач.
     void deleteTasks();
@@ -89,4 +89,6 @@ public interface TaskManager {
 
     // метод обновления статуса Эпика
     void updateEpicStatus(Epic epic);
+
+
 }

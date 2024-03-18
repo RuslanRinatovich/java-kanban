@@ -1,10 +1,7 @@
 package main;
 
 
-import main.models.Epic;
-import main.models.Status;
-import main.models.Subtask;
-import main.models.Task;
+import main.models.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,11 +11,6 @@ import java.util.Map;
 public class InMemoryTaskManager implements TaskManager {
     private int idTask = 0;
     private final HistoryManager historyManager;
-    // я так не делал, потому что один из ревьюеров написал студентам, что при такой
-    // реализации менеджер истории в оперативной памяти жестко зашивается в менеджер задач.
-    // Стоит использовать подход к инициализации поля через аргумент конструктора, это называется
-    // внедрением зависимости. Я реализовал так. Как лучше то?
-    // private final HistoryManager historyManager = Managers.getDefaultHistory();
     private final Map<Integer, Task> taskHashMap = new HashMap<>();
     private final Map<Integer, Epic> epicHashMap = new HashMap<>();
     private final Map<Integer, Subtask> subtaskHashMap = new HashMap<>();
@@ -72,17 +64,6 @@ public class InMemoryTaskManager implements TaskManager {
         taskHashMap.clear();
     }
 
-    //  c. Получение по идентификатору.
-    // Взято с метанита. объекты классов представляют ссылочные типы, то есть указывают на какой-то объект, расположенный в памяти
-    // Взято техзадания по покрытию тестами
-    // (убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных.)
-    // по заданию в истории я должен хранить разные версии одного и того же объекта под указанным Id
-    // я хочу реализовать клонирование(копирование) экзмепляра класса, чтобы сохранить в истории текущую версию
-    // для этой реализации есть два подхода: реализовать интерфейс Cloneable или
-    // создать новый экземпляр этого класса со значениями полей текущего экзмепляра классса(я выбрал второй вариант)
-    // могу убрать "копирование". Как тогда будет работать сохранение в менеджере предыдущих версии задач в Истории?
-    // я так понимаю, тогда в истории будут лежать просто ссылки, которые будут указывать на один и тот же участок памяти
-    //
 
     @Override
     public Task getTask(int id) {
@@ -113,9 +94,7 @@ public class InMemoryTaskManager implements TaskManager {
     // f. Удаление по идентификатору.
     @Override
     public void deleteTask(int id) {
-        if (taskHashMap.containsKey(id)) {
-            taskHashMap.remove(id);
-        }
+        taskHashMap.remove(id);
     }
 
     // g. изменение статуса задачи
@@ -268,7 +247,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epicHashMap.get(id);
             // удаляем подзадачи из subtaskHashMap
             for (int i : epic.getSubtasksIds()) {
-                subtaskHashMap.remove(id);
+                subtaskHashMap.remove(i);
             }
             epicHashMap.remove(id);
         }
