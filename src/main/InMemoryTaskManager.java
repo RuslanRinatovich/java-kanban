@@ -56,7 +56,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-
     // b. Удаление всех задач.
     @Override
     public void deleteTasks() throws ManagerSaveException {
@@ -68,7 +67,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTask(int id) throws ManagerSaveException {
         if (taskHashMap.containsKey(id)) {
             Task task = taskHashMap.get(id);
-            Task clonedTaskFoHistory = new Task(task.getId(), task.getTitle(), task.getDescription(),  task.getStatus());
+            Task clonedTaskFoHistory = new Task(task.getId(), task.getTitle(), task.getDescription(), task.getStatus());
             historyManager.add(clonedTaskFoHistory);
             return task;
         }
@@ -128,7 +127,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     //  c. Получение подзадачи по идентификатору.
     @Override
-    public Subtask getSubtask(int id) throws ManagerSaveException{
+    public Subtask getSubtask(int id) throws ManagerSaveException {
 
         if (subtaskHashMap.containsKey(id)) {
             Subtask subtask = subtaskHashMap.get(id);
