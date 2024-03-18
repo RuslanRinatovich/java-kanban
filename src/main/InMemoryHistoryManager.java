@@ -23,6 +23,16 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
+    public String getIdOfTasks(){
+        String result = "";
+        Node current = head;
+        while (current != null) {
+            result = result + "," + current.data.getId();
+            current = current.next;
+        }
+        return result;
+    }
+    @Override
     public void remove(int id) {
         removeNode(historyTask.remove(id));
     }
