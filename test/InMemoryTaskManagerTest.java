@@ -1,9 +1,6 @@
 import main.Managers;
 import main.TaskManager;
-import main.models.Epic;
-import main.models.Status;
-import main.models.Subtask;
-import main.models.Task;
+import main.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +13,7 @@ class InMemoryTaskManagerTest {
     private static TaskManager inMemoryTaskManager;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws ManagerSaveException {
         inMemoryTaskManager = Managers.getDefault();
 
         Task task1 = new Task("Задача 1", "Описание задачи 1", 0, Status.NEW);
