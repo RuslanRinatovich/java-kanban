@@ -5,6 +5,7 @@ import main.models.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
 import static main.Managers.getDefaultHistory;
@@ -20,30 +21,25 @@ public class CSVTaskFormatter {
             String[] lines = data.split("\n");
             FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), "tasks.csv");
             int index = -1;
-            for (String line: lines) {
+            for (String line : lines) {
                 // если строка пустая, значит мы завершили чтение тасков
                 index++;
                 if (line.isEmpty() || line.isBlank()) {
                     continue;
                 }
                 var task = fromString(line);
-                if (task instanceof Task)
-                {
+                if (task instanceof Task) {
                     fileBackedTaskManager.addTask(task);
                 }
-                if (task instanceof Epic)
-                {
+                if (task instanceof Epic) {
                     fileBackedTaskManager.addEpic((Epic) task);
                 }
-                if (task instanceof Subtask)
-                {
+                if (task instanceof Subtask) {
                     fileBackedTaskManager.addSubtask((Subtask) task);
                 }
             }
             index++;
-            String[] historyIds = lines[index].split(",");
-            for (String id: historyIds) {
-                int idTask = Integer.parseInt(id);
+            for (int idTask : historyFromString(lines[index])) {
                 if (fileBackedTaskManager.getTaskHashMap().containsKey(idTask))
                     fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getTask(idTask));
                 if (fileBackedTaskManager.getSubtaskHashMap().containsKey(idTask))
@@ -83,8 +79,12 @@ public class CSVTaskFormatter {
     }
 
     static List<Integer> historyFromString(String value) {
-
-
+        String[] historyIds = value.split(",");
+        List<Integer> result = new ArrayList<>();
+        for (String id : historyIds) {
+            result.add(Integer.parseInt(id));
+        }
+        return result;
     }
 
     // Создание task, subtask or epic в зависимости, какая строка передана
@@ -98,7 +98,7 @@ public class CSVTaskFormatter {
                 String title = data[2];
                 Status status = Status.valueOf(data[3]);
                 String description = data[4];
-                return new Task(id, title, description,  status);
+                return new Task(id, title, description, status);
             }
             case SUBTASK: {
                 int id = Integer.parseInt(data[0]);
@@ -114,7 +114,7 @@ public class CSVTaskFormatter {
                 String title = data[2];
                 Status status = Status.valueOf(data[3]);
                 String description = data[4];
-                return new Epic( id, title, description,status, null);
+                return new Epic(id, title, description, status, null);
             }
         }
         return null;
