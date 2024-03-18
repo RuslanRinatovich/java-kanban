@@ -11,6 +11,8 @@ public class CSVTaskFormatter {
 
     }
 
+
+    // Метод подготавливает строку для сохранения в файл
     static String makeDataToSave(List<Task> tasks, HistoryManager historyManager) {
 
         StringBuilder history = new StringBuilder();
