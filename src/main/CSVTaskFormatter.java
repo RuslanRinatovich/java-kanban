@@ -97,30 +97,20 @@ public class CSVTaskFormatter {
     public static Task fromString(String value) {
         //в качестве результата создает таск определенного типа
         String[] data = value.split(",");
+        int id = Integer.parseInt(data[0]);
+        String title = data[2];
+        Status status = Status.valueOf(data[3]);
+        String description = data[4];
         TaskType type = TaskType.valueOf(data[1]);
         switch (type) {
             case TASK: {
-                int id = Integer.parseInt(data[0]);
-                String title = data[2];
-                Status status = Status.valueOf(data[3]);
-                String description = data[4];
                 return new Task(id, title, description, status);
             }
             case SUBTASK: {
-                int id = Integer.parseInt(data[0]);
-                String title = data[2];
-                Status status = Status.valueOf(data[3]);
-                String description = data[4];
                 int epicId = Integer.parseInt(data[5]);
-
                 return new Subtask(id, title, description, status, epicId);
             }
             case EPIC: {
-                int id = Integer.parseInt(data[0]);
-                String title = data[2];
-                Status status = Status.valueOf(data[3]);
-                String description = data[4];
-
                 return new Epic(id, title, description, status, null);
             }
         }
