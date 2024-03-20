@@ -6,9 +6,24 @@ public class Epic extends Task {
 
     private ArrayList<Integer> subtasksIds;
 
-    public Epic(String title, String description, int id, Status status, ArrayList<Integer> subtasksIds) {
-        super(title, description, id, status);
+    public Epic(int id, String title, String description, Status status, ArrayList<Integer> subtasksIds) {
+        super(id, title, description, status);
         this.subtasksIds = subtasksIds;
+    }
+
+    public Epic(String title, String description, Status status, ArrayList<Integer> subtasksIds) {
+        super(title, description, status);
+        this.subtasksIds = subtasksIds;
+    }
+
+    private String getSubtasks() {
+        String result = "";
+        if (subtasksIds != null) {
+            for (int i : subtasksIds) {
+                result = result + i + " ";
+            }
+        }
+        return result;
     }
 
     public ArrayList<Integer> getSubtasksIds() {
@@ -18,6 +33,7 @@ public class Epic extends Task {
     public void setSubtasksIds(ArrayList<Integer> subtasksIds) {
         this.subtasksIds = subtasksIds;
     }
+
 
     public void removeSubtask(int id) {
         if (!this.subtasksIds.contains(id))
@@ -46,5 +62,10 @@ public class Epic extends Task {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
+    }
+
+    @Override
+    public String toStringForFile() {
+        return String.format("%d,EPIC,%s,%s,%s,%s", id, title, status, description, getSubtasks());
     }
 }

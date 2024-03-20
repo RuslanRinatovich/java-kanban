@@ -8,10 +8,17 @@ public class Task {
     protected int id;
     protected Status status;
 
-    public Task(String title, String description, int id, Status status) {
+    public Task(int id, String title, String description, Status status) {
         this.title = title;
         this.description = description;
         this.id = id;
+        this.status = status;
+    }
+
+    public Task(String title, String description, Status status) {
+        this.id = 0;
+        this.title = title;
+        this.description = description;
         this.status = status;
     }
 
@@ -68,5 +75,9 @@ public class Task {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
+    }
+
+    public String toStringForFile() {
+        return String.format("%d,TASK,%s,%s,%s,", id, title, status, description);
     }
 }

@@ -3,17 +3,14 @@ package main;
 
 import main.models.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int idTask = 0;
-    private final HistoryManager historyManager;
-    private final Map<Integer, Task> taskHashMap = new HashMap<>();
-    private final Map<Integer, Epic> epicHashMap = new HashMap<>();
-    private final Map<Integer, Subtask> subtaskHashMap = new HashMap<>();
+    protected final HistoryManager historyManager;
+    protected final Map<Integer, Task> taskHashMap = new HashMap<>();
+    protected final Map<Integer, Epic> epicHashMap = new HashMap<>();
+    protected final Map<Integer, Subtask> subtaskHashMap = new HashMap<>();
+    protected int idTask = 0;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -58,48 +55,52 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<Task>(taskHashMap.values());
     }
 
+
     // b. Удаление всех задач.
     @Override
-    public void deleteTasks() {
+    public void deleteTasks() throws ManagerSaveException {
         taskHashMap.clear();
     }
 
 
     @Override
-    public Task getTask(int id) {
+    public Task getTask(int id) throws ManagerSaveException {
         if (taskHashMap.containsKey(id)) {
             Task task = taskHashMap.get(id);
-
-            Task clonedTaskFoHistory = new Task(task.getTitle(), task.getDescription(), task.getId(), task.getStatus());
+            Task clonedTaskFoHistory = new Task(task.getId(), task.getTitle(), task.getDescription(), task.getStatus());
             historyManager.add(clonedTaskFoHistory);
             return task;
         }
         return null;
     }
 
+
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     @Override
-    public void addTask(Task newTask) {
-        int id = getNewId();
-        newTask.setId(id);
+    public void addTask(Task newTask) throws ManagerSaveException {
+        int id = newTask.getId();
+        if (id == 0) {
+            id = getNewId();
+            newTask.setId(id);
+        }
         taskHashMap.put(id, newTask);
     }
 
     //e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     @Override
-    public void updateTask(Task newTask) {
+    public void updateTask(Task newTask) throws ManagerSaveException {
         taskHashMap.replace(newTask.getId(), newTask);
     }
 
     // f. Удаление по идентификатору.
     @Override
-    public void deleteTask(int id) {
+    public void deleteTask(int id) throws ManagerSaveException {
         taskHashMap.remove(id);
     }
 
     // g. изменение статуса задачи
     @Override
-    public void changeTaskStatus(Task task, Status status) {
+    public void changeTaskStatus(Task task, Status status) throws ManagerSaveException {
         task.setStatus(status);
     }
 
@@ -116,7 +117,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     //b. Удаление всех подзадач
     @Override
-    public void deleteSubtasks() {
+    public void deleteSubtasks() throws ManagerSaveException {
         // во всех эпиках очищаем список индентификаторов его подзадач
         for (Epic e : epicHashMap.values()) {
             e.clearAllSubtasks();
@@ -126,11 +127,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     //  c. Получение подзадачи по идентификатору.
     @Override
-    public Subtask getSubtask(int id) {
+    public Subtask getSubtask(int id) throws ManagerSaveException {
 
         if (subtaskHashMap.containsKey(id)) {
             Subtask subtask = subtaskHashMap.get(id);
-            Subtask clonedTaskFoHistory = new Subtask(subtask.getTitle(), subtask.getDescription(), subtask.getId(), subtask.getStatus(), subtask.getEpicId());
+            Subtask clonedTaskFoHistory = new Subtask(subtask.getId(), subtask.getTitle(), subtask.getDescription(), subtask.getStatus(), subtask.getEpicId());
             historyManager.add(clonedTaskFoHistory);
             return subtask;
         }
@@ -139,18 +140,25 @@ public class InMemoryTaskManager implements TaskManager {
 
     // d. Создание подзадачи. Сам объект должен передаваться в качестве параметра.
     @Override
-    public void addSubtask(Subtask newSubtask) {
-        int id = getNewId();
-        newSubtask.setId(id);
+    public void addSubtask(Subtask newSubtask) throws ManagerSaveException {
+        int id = newSubtask.getId();
+        if (id == 0) {
+            id = getNewId();
+            newSubtask.setId(id);
+        }
         subtaskHashMap.put(id, newSubtask);
-        Epic epic = epicHashMap.get(newSubtask.getEpicId());
-        epic.addSubtaskId(id);
-        updateEpicStatus(epic);
+
+        Epic epic = epicHashMap.getOrDefault(newSubtask.getEpicId(), null);
+        if (epic != null) {
+            epic.addSubtaskId(id);
+            updateEpicStatus(epic);
+        }
+
     }
 
     //e. Обновление подзадачи. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     @Override
-    public void updateSubtask(Subtask newSubtask) {
+    public void updateSubtask(Subtask newSubtask) throws ManagerSaveException {
         subtaskHashMap.replace(newSubtask.getId(), newSubtask);
         Epic epic = epicHashMap.get(newSubtask.getEpicId());
         updateEpicStatus(epic);
@@ -158,7 +166,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // f. Удаление подзадачи по идентификатору.
     @Override
-    public void deleteSubtask(int id) {
+    public void deleteSubtask(int id) throws ManagerSaveException {
         if (subtaskHashMap.containsKey(id)) {
             Subtask subtask = subtaskHashMap.get(id);
             Epic epic = epicHashMap.get(subtask.getEpicId());
@@ -170,7 +178,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void changeSubtaskStatus(Subtask subtask, Status status) {
+    public void changeSubtaskStatus(Subtask subtask, Status status) throws ManagerSaveException {
         // при изменении статуса подзадачи надо пересмотреть статус Эпика
         subtask.setStatus(status);
         Epic epic = epicHashMap.get(subtask.getEpicId());
@@ -194,55 +202,57 @@ public class InMemoryTaskManager implements TaskManager {
     //  a. Получение списка всех эпиков.
     @Override
     public List<Epic> getEpics() {
-        return new ArrayList<Epic>(epicHashMap.values());
+        return new ArrayList<>(epicHashMap.values());
     }
 
 
     // b. Удаление всех эпиков и их подзадач.
     @Override
-    public void deleteEpics() {
+    public void deleteEpics() throws ManagerSaveException {
         epicHashMap.clear();
         subtaskHashMap.clear();
     }
 
     //  c. Получение по идентификатору.
     @Override
-    public Epic getEpic(int id) {
+    public Epic getEpic(int id) throws ManagerSaveException {
         if (epicHashMap.containsKey(id)) {
-            Epic t = epicHashMap.get(id);
-            Epic clonedTaskFoHistory = new Epic(t.getTitle(), t.getDescription(), t.getId(), t.getStatus(), t.getSubtasksIds());
+            Epic epic = epicHashMap.get(id);
+            Epic clonedTaskFoHistory = new Epic(epic.getId(), epic.getTitle(), epic.getDescription(), epic.getStatus(), epic.getSubtasksIds());
             historyManager.add(clonedTaskFoHistory);
 
-            return t;
+            return epic;
         }
         return null;
     }
 
     // d. Создание. Сам объект должен передаваться в качестве параметра.
     @Override
-    public void addEpic(Epic newEpic) {
-
-        int id = getNewId();
-        newEpic.setId(id);
+    public void addEpic(Epic newEpic) throws ManagerSaveException {
+        int id = newEpic.getId();
+        if (id == 0) {
+            id = getNewId();
+            newEpic.setId(id);
+        }
         epicHashMap.put(id, newEpic);
     }
 
     //e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     @Override
-    public void updateEpic(Epic newEpic) {
+    public void updateEpic(Epic newEpic) throws ManagerSaveException {
         epicHashMap.replace(newEpic.getId(), newEpic);
     }
 
 
     @Override
-    public void removeEpicSubtask(Epic epic, int id) {
+    public void removeEpicSubtask(Epic epic, int id) throws ManagerSaveException {
         epic.removeSubtask(id);
         updateEpicStatus(epic);
     }
 
     // f. Удаление по идентификатору.
     @Override
-    public void deleteEpic(int id) {
+    public void deleteEpic(int id) throws ManagerSaveException {
         if (epicHashMap.containsKey(id)) {
             Epic epic = epicHashMap.get(id);
             // удаляем подзадачи из subtaskHashMap
@@ -255,7 +265,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // метод обновления статуса Эпика
     @Override
-    public void updateEpicStatus(Epic epic) {
+    public void updateEpicStatus(Epic epic) throws ManagerSaveException {
         // список подзадач пуст
         if (epic.getSubtasksIds().isEmpty()) {
             epic.setStatus(Status.NEW);

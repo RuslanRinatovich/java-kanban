@@ -1,10 +1,9 @@
 import main.HistoryManager;
-import main.InMemoryTaskManager;
 import main.Managers;
 import main.TaskManager;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ManagersTest {
 
