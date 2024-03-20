@@ -50,13 +50,19 @@ public class CSVTaskFormatter {
 
 
     // Метод подготавливает строку для сохранения в файл
-    static String makeDataToSave(List<Task> tasks, HistoryManager historyManager) {
+    static String makeDataToSave(List<Task> tasks, List<Subtask> subtasks, List<Epic> epics, HistoryManager historyManager) {
 
         StringBuilder history = new StringBuilder();
         history.append("id,type,name,status,description,epic or subtasks\n");
 
-        for (var task : tasks) {
+        for (Task task : tasks) {
             history.append(task.toStringForFile()).append("\n");
+        }
+        for (Subtask subtask : subtasks) {
+            history.append(subtask.toStringForFile()).append("\n");
+        }
+        for (Epic epic : epics) {
+            history.append(epic.toStringForFile()).append("\n");
         }
         history.append("\n");
         if (historyManager.getHistory().isEmpty())
