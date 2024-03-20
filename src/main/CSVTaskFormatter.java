@@ -33,17 +33,17 @@ public class CSVTaskFormatter {
 
     // Возвращает строку из id задач через запятую, которые есть в истории
     static String historyToString(HistoryManager manager) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         int i = 0;
         for (var task : manager.getHistory()) {
             if (i == 0) {
-                result = result + task.getId();
+                result.append(task.getId());
             } else {
-                result = result + "," + task.getId();
+                result.append(",").append(task.getId());
             }
             i++;
         }
-        return result;
+        return result.toString();
     }
 
     static List<Integer> historyFromString(String value) {
