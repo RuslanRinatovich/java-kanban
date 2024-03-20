@@ -24,11 +24,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public void save() throws ManagerSaveException {
         try (BufferedWriter wr = new BufferedWriter(new FileWriter(autoSaveFileName, StandardCharsets.UTF_8))) {
-            List<Task> tasks = new ArrayList<>();
-            tasks.addAll(getTasks());
-            tasks.addAll(getSubtasks());
-            tasks.addAll(getEpics());
-            wr.write(makeDataToSave(tasks, this.historyManager));
+            wr.write("id,type,name,status,description,epic or subtasks\n");
+            wr.write(makeDataToSave(getTasks(), getSubtasks(), getEpics(), this.historyManager));
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка работы с файлом", e);
         }
