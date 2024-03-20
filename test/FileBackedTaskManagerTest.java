@@ -5,12 +5,10 @@ import main.TaskManager;
 import main.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import static main.CSVTaskFormatter.loadFromFile;
+import static main.FileBackedTaskManager.loadFromFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -44,7 +42,6 @@ public class FileBackedTaskManagerTest {
         fileBackedTaskManager1.addSubtask(subtask2);//4
         Task actual = fileBackedTaskManager1.getTask(1);
         Subtask subtask = fileBackedTaskManager1.getSubtask(3);
-
         TaskManager loadedFromFileBackedTaskManager = loadFromFile(new File("test.csv"));
         assertEquals(loadedFromFileBackedTaskManager.getTasks().size(), fileBackedTaskManager1.getTasks().size(), "Задачи не совпадают");
         assertEquals(loadedFromFileBackedTaskManager.getHistory().size(), fileBackedTaskManager1.getHistory().size(), "Задачи не совпадают");
@@ -76,7 +73,6 @@ public class FileBackedTaskManagerTest {
         }
 
     }
-
 
     @Test
     public void getTaskById() throws ManagerSaveException {

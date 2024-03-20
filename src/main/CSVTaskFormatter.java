@@ -1,53 +1,11 @@
 package main;
 
 import main.models.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CSVTaskFormatter {
-
-    // генерация FileBackedTaskManager из файла
-    public static FileBackedTaskManager loadFromFile(File file) throws ManagerSaveException {
-        try {
-            // считываем целиком текст из файла в строковую переменную
-            String data = Files.readString(file.toPath());
-            // создаем на основе файла массив строк
-            String[] lines = data.split("\n");
-            FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file);
-            int size = lines.length;
-
-            for (int i = 1; i < size - 2; i++) {
-                var task = fromString(lines[i]);
-                if (task instanceof Epic) {
-                    fileBackedTaskManager.addEpic((Epic) task);
-                } else if (task instanceof Subtask) {
-                    fileBackedTaskManager.addSubtask((Subtask) task);
-                } else {
-                    fileBackedTaskManager.addTask(task);
-                }
-            }
-
-            List<Integer> history = historyFromString(lines[size - 1]);
-            if (!history.isEmpty()) {
-                for (int idTask : history) {
-                    if (fileBackedTaskManager.getTaskHashMap().containsKey(idTask))
-                        fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getTask(idTask));
-                    if (fileBackedTaskManager.getSubtaskHashMap().containsKey(idTask))
-                        fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getSubtask(idTask));
-                    if (fileBackedTaskManager.getEpicHashMap().containsKey(idTask))
-                        fileBackedTaskManager.historyManager.add(fileBackedTaskManager.getEpic(idTask));
-                }
-            }
-            return fileBackedTaskManager;
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка работы с файлом", e);
-        }
-
-    }
-
 
     // Метод подготавливает строку для сохранения в файл
     static String makeDataToSave(List<Task> tasks, List<Subtask> subtasks, List<Epic> epics, HistoryManager historyManager) {
