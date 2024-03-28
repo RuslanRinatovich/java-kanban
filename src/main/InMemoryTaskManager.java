@@ -11,6 +11,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Task> taskHashMap = new HashMap<>();
     protected final Map<Integer, Epic> epicHashMap = new HashMap<>();
     protected final Map<Integer, Subtask> subtaskHashMap = new HashMap<>();
+    protected final  TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
     protected int idTask = 0;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
@@ -38,6 +39,11 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
+
+    public TreeSet<Task> getPrioritizedTasks()
+    {
+        return prioritizedTasks;
+    }
     // -----------------------------------------------------------
     // Методы для работы с задачами
     public int getId() {
@@ -60,6 +66,7 @@ public class InMemoryTaskManager implements TaskManager {
     // b. Удаление всех задач.
     @Override
     public void deleteTasks() throws ManagerSaveException {
+        prioritizedTasks.removeAll(taskHashMap.values());
         taskHashMap.clear();
     }
 
@@ -85,17 +92,22 @@ public class InMemoryTaskManager implements TaskManager {
             newTask.setId(id);
         }
         taskHashMap.put(id, newTask);
+        prioritizedTasks.add(newTask);
+
     }
 
     //e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     @Override
     public void updateTask(Task newTask) throws ManagerSaveException {
+        prioritizedTasks.remove(taskHashMap.get(newTask.getId()));
         taskHashMap.replace(newTask.getId(), newTask);
+        prioritizedTasks.add(newTask);
     }
 
     // f. Удаление по идентификатору.
     @Override
     public void deleteTask(int id) throws ManagerSaveException {
+        prioritizedTasks.remove(taskHashMap.get(id));
         taskHashMap.remove(id);
     }
 
@@ -125,6 +137,7 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicStatus(e);
             updateEpicDurationAndTime(e);
         }
+        prioritizedTasks.removeAll(subtaskHashMap.values());
         subtaskHashMap.clear();
     }
 
@@ -150,7 +163,7 @@ public class InMemoryTaskManager implements TaskManager {
             newSubtask.setId(id);
         }
         subtaskHashMap.put(id, newSubtask);
-
+        prioritizedTasks.add(newSubtask);
         Epic epic = epicHashMap.getOrDefault(newSubtask.getEpicId(), null);
         if (epic != null) {
             epic.addSubtaskId(id);
@@ -163,7 +176,9 @@ public class InMemoryTaskManager implements TaskManager {
     //e. Обновление подзадачи. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     @Override
     public void updateSubtask(Subtask newSubtask) throws ManagerSaveException {
+        prioritizedTasks.remove(subtaskHashMap.get(newSubtask.getId()));
         subtaskHashMap.replace(newSubtask.getId(), newSubtask);
+        prioritizedTasks.add(newSubtask);
         Epic epic = epicHashMap.get(newSubtask.getEpicId());
         updateEpicStatus(epic);
         updateEpicDurationAndTime(epic);
@@ -176,6 +191,7 @@ public class InMemoryTaskManager implements TaskManager {
             Subtask subtask = subtaskHashMap.get(id);
             Epic epic = epicHashMap.get(subtask.getEpicId());
             // удалить идентификатор у эпика
+            prioritizedTasks.remove(subtask);
             epic.removeSubtask(id);
             subtaskHashMap.remove(id);
             updateEpicStatus(epic);
@@ -216,6 +232,7 @@ public class InMemoryTaskManager implements TaskManager {
     // b. Удаление всех эпиков и их подзадач.
     @Override
     public void deleteEpics() throws ManagerSaveException {
+
         epicHashMap.clear();
         subtaskHashMap.clear();
     }
