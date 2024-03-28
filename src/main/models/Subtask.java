@@ -2,6 +2,7 @@ package main.models;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Subtask extends Task {
 
@@ -26,18 +27,21 @@ public class Subtask extends Task {
     }
 
     @Override
+    public String toStringForFile() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        return String.format("%d,SUBTASK,%s,%s,%s,%d,%s", id, title, status, description, duration, startTime.format(formatter));
+    }
+
+    @Override
     public String toString() {
-        return "main.models.Subtask{" +
+        return "Subtask{" +
                 "epicId=" + epicId +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", status=" + status +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
-    }
-
-    @Override
-    public String toStringForFile() {
-        return String.format("%d,SUBTASK,%s,%s,%s,%d", id, title, status, description, epicId);
     }
 }

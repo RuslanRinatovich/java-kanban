@@ -2,6 +2,9 @@ package main;
 
 import main.models.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,11 +14,12 @@ public class CSVTaskFormatter {
     static String makeDataToSave(List<Task> tasks, List<Subtask> subtasks, List<Epic> epics, HistoryManager historyManager) {
 
         StringBuilder history = new StringBuilder();
-        history.append("id,type,name,status,description,epic or subtasks\n");
+        history.append("id,type,name,status,description,duration,startTime,epic or subtasks\n");
 
         for (Task task : tasks) {
             history.append(task.toStringForFile()).append("\n");
         }
+
         for (Subtask subtask : subtasks) {
             history.append(subtask.toStringForFile()).append("\n");
         }
@@ -66,16 +70,19 @@ public class CSVTaskFormatter {
         Status status = Status.valueOf(data[3]);
         String description = data[4];
         TaskType type = TaskType.valueOf(data[1]);
+        int duration = Integer.parseInt(data[5]);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        LocalDateTime startTime = LocalDateTime.parse(data[6], formatter);
         switch (type) {
             case TASK: {
-                return new Task(id, title, description, status);
+                return new Task(id, title, description, status, Duration.ofMinutes(duration), startTime);
             }
             case SUBTASK: {
                 int epicId = Integer.parseInt(data[5]);
-                return new Subtask(id, title, description, status, epicId);
+                return new Subtask(id, title, description, status, Duration.ofMinutes(duration), startTime, epicId);
             }
             case EPIC: {
-                return new Epic(id, title, description, status, null);
+                return new Epic(id, title, description, status, Duration.ofMinutes(duration), startTime,null);
             }
         }
         return null;

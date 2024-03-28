@@ -2,6 +2,7 @@ package main.models;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -9,13 +10,13 @@ public class Epic extends Task {
     private ArrayList<Integer> subtasksIds;
     private LocalDateTime endTime;
 
-    public Epic(int id, String title, String description, Status status, ArrayList<Integer> subtasksIds) {
-        super(id, title, description, status, Duration.ofMinutes(0), null);
+    public Epic(int id, String title, String description, Status status, Duration duration, LocalDateTime startTime, ArrayList<Integer> subtasksIds) {
+        super(id, title, description, status, duration, startTime);
         this.subtasksIds = subtasksIds;
     }
 
-    public Epic(String title, String description, Status status, ArrayList<Integer> subtasksIds) {
-        super(title, description, status, Duration.ofMinutes(0), null);
+    public Epic(String title, String description, Status status, Duration duration, LocalDateTime startTime, ArrayList<Integer> subtasksIds) {
+        super(title, description, status, duration, startTime);
         this.subtasksIds = subtasksIds;
     }
 
@@ -78,6 +79,13 @@ public class Epic extends Task {
 
     @Override
     public String toStringForFile() {
-        return String.format("%d,EPIC,%s,%s,%s,%s", id, title, status, description, getSubtasks());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        if (!subtasksIds.isEmpty())
+            return String.format("%d,EPIC,%s,%s,%s,%d,%s,%s", id, title, status, description, duration, startTime.format(formatter), getSubtasks());
+
+        return String.format("%d,EPIC,%s,%s,%s,%d,%s", id, title, status, description, duration, startTime.format(formatter));
+
+
+
     }
 }

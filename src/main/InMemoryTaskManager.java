@@ -225,9 +225,8 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpic(int id) throws ManagerSaveException {
         if (epicHashMap.containsKey(id)) {
             Epic epic = epicHashMap.get(id);
-            Epic clonedTaskFoHistory = new Epic(epic.getId(), epic.getTitle(), epic.getDescription(), epic.getStatus(), epic.getSubtasksIds());
+            Epic clonedTaskFoHistory = new Epic(epic.getId(), epic.getTitle(), epic.getDescription(), epic.getStatus(),epic.getDuration(), epic.getStartTime(), epic.getSubtasksIds());
             historyManager.add(clonedTaskFoHistory);
-
             return epic;
         }
         return null;
