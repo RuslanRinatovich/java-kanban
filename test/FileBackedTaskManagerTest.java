@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 import static main.FileBackedTaskManager.loadFromFile;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FileBackedTaskManagerTest {
     private static TaskManager fileBackedTaskManager;
@@ -80,8 +79,15 @@ public class FileBackedTaskManagerTest {
         }
 
     }
+    // Тест проверяет наличие пересечений между задачами по времени
+    @Test
+    public void addIntersectedTask() throws ManagerSaveException {
+        Task expected = new Task("Задача 2", "Описание задачи 2",  Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,28,10,5));
+        assertThrows(ManagerSaveException.class, () -> {
+            fileBackedTaskManager.addTask(expected);
+        }, "Пересечение");
 
-
+    }
     @Test
     public void getPriorityFirstTask() throws ManagerSaveException {
         Task expected = new Task("Задача 2", "Описание задачи 1",  Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,28,8,0));

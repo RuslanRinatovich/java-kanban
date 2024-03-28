@@ -44,6 +44,12 @@ public class InMemoryTaskManager implements TaskManager {
     {
         return prioritizedTasks;
     }
+
+    @Override
+    public boolean isTasksIntersected(Task firstTask, Task secondTask)
+    {
+        return (firstTask.getEndTime().isAfter(secondTask.getStartTime()) || secondTask.getEndTime().isAfter(firstTask.getStartTime()));
+    }
     // -----------------------------------------------------------
     // Методы для работы с задачами
     public int getId() {
@@ -91,8 +97,16 @@ public class InMemoryTaskManager implements TaskManager {
             id = getNewId();
             newTask.setId(id);
         }
+
+        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(newTask, task)).findFirst();
+        if (intersectedTask.isPresent())
+        {
+            throw new ManagerSaveException("Пересечение задач", new Exception());
+        }
+
         taskHashMap.put(id, newTask);
-        prioritizedTasks.add(newTask);
+        if (newTask.getStartTime() != null)
+            prioritizedTasks.add(newTask);
 
     }
 
@@ -101,7 +115,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task newTask) throws ManagerSaveException {
         prioritizedTasks.remove(taskHashMap.get(newTask.getId()));
         taskHashMap.replace(newTask.getId(), newTask);
-        prioritizedTasks.add(newTask);
+        if (newTask.getStartTime() != null)
+            prioritizedTasks.add(newTask);
     }
 
     // f. Удаление по идентификатору.
@@ -163,7 +178,8 @@ public class InMemoryTaskManager implements TaskManager {
             newSubtask.setId(id);
         }
         subtaskHashMap.put(id, newSubtask);
-        prioritizedTasks.add(newSubtask);
+        if (newSubtask.getStartTime() != null)
+            prioritizedTasks.add(newSubtask);
         Epic epic = epicHashMap.getOrDefault(newSubtask.getEpicId(), null);
         if (epic != null) {
             epic.addSubtaskId(id);
@@ -178,7 +194,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubtask(Subtask newSubtask) throws ManagerSaveException {
         prioritizedTasks.remove(subtaskHashMap.get(newSubtask.getId()));
         subtaskHashMap.replace(newSubtask.getId(), newSubtask);
-        prioritizedTasks.add(newSubtask);
+        if (newSubtask.getStartTime() != null)
+            prioritizedTasks.add(newSubtask);
         Epic epic = epicHashMap.get(newSubtask.getEpicId());
         updateEpicStatus(epic);
         updateEpicDurationAndTime(epic);

@@ -15,7 +15,8 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-TreeSet<Task> getPrioritizedTasks();
+    boolean isTasksIntersected(Task firstTask, Task secondTask);
+    TreeSet<Task> getPrioritizedTasks();
     // -----------------------------------------------------------
     // Методы для работы с задачами
     int getNewId();
