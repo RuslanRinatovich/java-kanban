@@ -80,12 +80,6 @@ public class Epic extends Task {
     @Override
     public String toStringForFile() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-        if (!subtasksIds.isEmpty())
-            return String.format("%d,EPIC,%s,%s,%s,%d,%s,%s", id, title, status, description, duration, startTime.format(formatter), getSubtasks());
-
-        return String.format("%d,EPIC,%s,%s,%s,%d,%s", id, title, status, description, duration, startTime.format(formatter));
-
-
-
+        return String.format("%d,EPIC,%s,%s,%s,%d,%s,%s", id, title, status, description, duration, startTime.format(formatter), getSubtasks() );
     }
 }
