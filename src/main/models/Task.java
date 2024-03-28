@@ -43,6 +43,16 @@ public class Task {
     {
         return this.startTime.plusMinutes(this.duration);
     }
+
+    public  LocalDateTime getStartTime()
+    {
+        return this.startTime;
+    }
+
+    public  void setStartTime(LocalDateTime startTime)
+    {
+        this.startTime = startTime;
+    }
     public String getTitle() {
         return title;
     }

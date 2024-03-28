@@ -3,6 +3,7 @@ package main;
 
 import main.models.*;
 
+import java.time.Duration;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -67,7 +68,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTask(int id) throws ManagerSaveException {
         if (taskHashMap.containsKey(id)) {
             Task task = taskHashMap.get(id);
-            Task clonedTaskFoHistory = new Task(task.getId(), task.getTitle(), task.getDescription(), task.getStatus());
+            Task clonedTaskFoHistory = new Task(task.getId(), task.getTitle(), task.getDescription(), task.getStatus(), task.getDuration(), task.getStartTime());
             historyManager.add(clonedTaskFoHistory);
             return task;
         }
@@ -121,6 +122,8 @@ public class InMemoryTaskManager implements TaskManager {
         // во всех эпиках очищаем список индентификаторов его подзадач
         for (Epic e : epicHashMap.values()) {
             e.clearAllSubtasks();
+            updateEpicStatus(e);
+            updateEpicDurationAndTime(e);
         }
         subtaskHashMap.clear();
     }
@@ -131,7 +134,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (subtaskHashMap.containsKey(id)) {
             Subtask subtask = subtaskHashMap.get(id);
-            Subtask clonedTaskFoHistory = new Subtask(subtask.getId(), subtask.getTitle(), subtask.getDescription(), subtask.getStatus(), subtask.getEpicId());
+            Subtask clonedTaskFoHistory = new Subtask(subtask.getId(), subtask.getTitle(), subtask.getDescription(), subtask.getStatus(), subtask.getDuration(), subtask.getStartTime(), subtask.getEpicId());
             historyManager.add(clonedTaskFoHistory);
             return subtask;
         }
@@ -152,6 +155,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             epic.addSubtaskId(id);
             updateEpicStatus(epic);
+            updateEpicDurationAndTime(epic);
         }
 
     }
@@ -162,6 +166,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtaskHashMap.replace(newSubtask.getId(), newSubtask);
         Epic epic = epicHashMap.get(newSubtask.getEpicId());
         updateEpicStatus(epic);
+        updateEpicDurationAndTime(epic);
     }
 
     // f. Удаление подзадачи по идентификатору.
@@ -174,6 +179,7 @@ public class InMemoryTaskManager implements TaskManager {
             epic.removeSubtask(id);
             subtaskHashMap.remove(id);
             updateEpicStatus(epic);
+            updateEpicDurationAndTime(epic);
         }
     }
 
@@ -183,6 +189,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setStatus(status);
         Epic epic = epicHashMap.get(subtask.getEpicId());
         updateEpicStatus(epic);
+
     }
 
 
@@ -248,6 +255,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeEpicSubtask(Epic epic, int id) throws ManagerSaveException {
         epic.removeSubtask(id);
         updateEpicStatus(epic);
+        updateEpicDurationAndTime(epic);
     }
 
     // f. Удаление по идентификатору.
@@ -285,5 +293,25 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setStatus(Status.IN_PROGRESS);
     }
 
+// Метод для рассчёта длительности, времени начала и окончания эпика
+    public void updateEpicDurationAndTime(Epic epic) throws ManagerSaveException {
+        // список подзадач пуст
+        if (epic.getSubtasksIds().isEmpty()) {
+            epic.setDuration(Duration.ofMinutes(0));
+            epic.setStartTime(null);
+            epic.setEndTime(null);
+            return;
+        }
+        // получаем первую по времени начала подзадачу
+        Optional<Subtask> firstSubtask = subtaskHashMap.values().stream().filter(s -> epic.getSubtasksIds().contains(s.getId())).min(Comparator.comparing(Task::getStartTime)).stream().findFirst();
+        firstSubtask.ifPresent(value -> epic.setStartTime(value.getStartTime()));
+        // получаем последнюю по времени начала подзадачу
+        Optional<Subtask> lastSubtask = subtaskHashMap.values().stream().filter(s -> epic.getSubtasksIds().contains(s.getId())).
+                max(Comparator.comparing(Task::getEndTime)).stream().findFirst();
+        lastSubtask.ifPresent(value -> epic.setEndTime(value.getStartTime()));
+        long totalDuration = 0;
+        for (int i: epic.getSubtasksIds()) totalDuration = totalDuration + subtaskHashMap.get(i).getDuration().toMinutes();
+        epic.setDuration(Duration.ofMinutes(totalDuration));
+    }
 }
 

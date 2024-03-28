@@ -1,21 +1,33 @@
 package main.models;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Epic extends Task {
 
     private ArrayList<Integer> subtasksIds;
+    private LocalDateTime endTime;
 
     public Epic(int id, String title, String description, Status status, ArrayList<Integer> subtasksIds) {
-        super(id, title, description, status);
+        super(id, title, description, status, Duration.ofMinutes(0), null);
         this.subtasksIds = subtasksIds;
     }
 
     public Epic(String title, String description, Status status, ArrayList<Integer> subtasksIds) {
-        super(title, description, status);
+        super(title, description, status, Duration.ofMinutes(0), null);
         this.subtasksIds = subtasksIds;
     }
 
+    public  LocalDateTime getEndTime()
+    {
+        return this.endTime;
+    }
+
+    public  void setEndTime(LocalDateTime endTime)
+    {
+        this.endTime = endTime;
+    }
     private String getSubtasks() {
         String result = "";
         if (subtasksIds != null) {
