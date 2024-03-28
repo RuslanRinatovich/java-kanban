@@ -46,7 +46,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public boolean isTasksIntersected(Task firstTask, Task secondTask) {
-        return (firstTask.getEndTime().isAfter(secondTask.getStartTime()) || secondTask.getEndTime().isAfter(firstTask.getStartTime()));
+        return (firstTask.getEndTime().isAfter(secondTask.getStartTime()) && firstTask.getEndTime().isBefore(secondTask.getEndTime()) ||
+                secondTask.getEndTime().isAfter(firstTask.getStartTime()) && secondTask.getEndTime().isBefore(firstTask.getEndTime()));
     }
 
     // -----------------------------------------------------------
@@ -97,7 +98,9 @@ public class InMemoryTaskManager implements TaskManager {
             newTask.setId(id);
         }
 
-        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(newTask, task)).findFirst();
+        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> {
+            return isTasksIntersected(newTask, task);
+        }).findFirst();
         if (intersectedTask.isPresent()) {
             throw new ManagerSaveException("Пересечение задач", new Exception());
         }
@@ -174,10 +177,10 @@ public class InMemoryTaskManager implements TaskManager {
             newSubtask.setId(id);
         }
 
-        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(newSubtask, task)).findFirst();
-        if (intersectedTask.isPresent()) {
-            throw new ManagerSaveException("Пересечение задач", new Exception());
-        }
+//        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(newSubtask, task)).findFirst();
+//        if (intersectedTask.isPresent()) {
+//            throw new ManagerSaveException("Пересечение задач", new Exception());
+//        }
         subtaskHashMap.put(id, newSubtask);
         if (newSubtask.getStartTime() != null) prioritizedTasks.add(newSubtask);
         Epic epic = epicHashMap.getOrDefault(newSubtask.getEpicId(), null);

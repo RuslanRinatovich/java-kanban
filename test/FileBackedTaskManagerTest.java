@@ -100,7 +100,7 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void getPriorityLastTask() throws ManagerSaveException {
-        Task expected = new Task("Задача 2", "Описание задачи 1",  Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,28,13,1));
+        Task expected = new Task("Задача 2", "Описание задачи 1",  Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,28,14,1));
         fileBackedTaskManager.addTask(expected); //1
         TreeSet<Task> priority = fileBackedTaskManager.getPrioritizedTasks();
 
