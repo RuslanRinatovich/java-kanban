@@ -177,6 +177,12 @@ public class InMemoryTaskManager implements TaskManager {
             id = getNewId();
             newSubtask.setId(id);
         }
+
+        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(newSubtask, task)).findFirst();
+        if (intersectedTask.isPresent())
+        {
+            throw new ManagerSaveException("Пересечение задач", new Exception());
+        }
         subtaskHashMap.put(id, newSubtask);
         if (newSubtask.getStartTime() != null)
             prioritizedTasks.add(newSubtask);
