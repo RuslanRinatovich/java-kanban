@@ -20,15 +20,14 @@ public class Epic extends Task {
         this.subtasksIds = subtasksIds;
     }
 
-    public  LocalDateTime getEndTime()
-    {
+    public LocalDateTime getEndTime() {
         return this.endTime;
     }
 
-    public  void setEndTime(LocalDateTime endTime)
-    {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
+
     private String getSubtasks() {
         String result = "";
         if (subtasksIds != null) {
@@ -80,6 +79,6 @@ public class Epic extends Task {
     @Override
     public String toStringForFile() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-        return String.format("%d,EPIC,%s,%s,%s,%d,%s,%s", id, title, status, description, duration, startTime.format(formatter), getSubtasks() );
+        return String.format("%d,EPIC,%s,%s,%s,%d,%s,%s", id, title, status, description, duration, startTime.format(formatter), getSubtasks());
     }
 }

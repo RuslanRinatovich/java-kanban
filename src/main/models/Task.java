@@ -33,7 +33,6 @@ public class Task {
     }
 
 
-
     public Duration getDuration() {
         return Duration.ofMinutes(duration);
     }
@@ -42,20 +41,18 @@ public class Task {
         this.duration = duration.toMinutes();
     }
 
-    public  LocalDateTime getEndTime()
-    {
+    public LocalDateTime getEndTime() {
         return this.startTime.plusMinutes(this.duration);
     }
 
-    public  LocalDateTime getStartTime()
-    {
+    public LocalDateTime getStartTime() {
         return this.startTime;
     }
 
-    public  void setStartTime(LocalDateTime startTime)
-    {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
+
     public String getTitle() {
         return title;
     }
@@ -100,7 +97,6 @@ public class Task {
     public int hashCode() {
         return Objects.hash(title, description, id, status);
     }
-
 
 
     public String toStringForFile() {

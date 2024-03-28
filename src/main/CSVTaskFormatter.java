@@ -82,7 +82,7 @@ public class CSVTaskFormatter {
                 return new Subtask(id, title, description, status, Duration.ofMinutes(duration), startTime, epicId);
             }
             case EPIC: {
-                return new Epic(id, title, description, status, Duration.ofMinutes(duration), startTime,null);
+                return new Epic(id, title, description, status, Duration.ofMinutes(duration), startTime, null);
             }
         }
         return null;
