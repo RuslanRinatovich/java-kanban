@@ -44,8 +44,8 @@ public class InMemoryTaskManager implements TaskManager {
         return prioritizedTasks;
     }
 
-    @Override
-    public boolean isTasksIntersected(Task firstTask, Task secondTask) {
+
+    private boolean isTasksIntersected(Task firstTask, Task secondTask) {
         return (firstTask.getEndTime().isAfter(secondTask.getStartTime()) && firstTask.getEndTime().isBefore(secondTask.getEndTime()) ||
                 secondTask.getEndTime().isAfter(firstTask.getStartTime()) && secondTask.getEndTime().isBefore(firstTask.getEndTime()));
     }
