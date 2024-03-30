@@ -39,7 +39,7 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    @Override
+
     public TreeSet<Task> getPrioritizedTasks() {
         return prioritizedTasks;
     }
@@ -48,6 +48,13 @@ public class InMemoryTaskManager implements TaskManager {
     private boolean isTasksIntersected(Task firstTask, Task secondTask) {
         return (firstTask.getEndTime().isAfter(secondTask.getStartTime()) && firstTask.getEndTime().isBefore(secondTask.getEndTime()) ||
                 secondTask.getEndTime().isAfter(firstTask.getStartTime()) && secondTask.getEndTime().isBefore(firstTask.getEndTime()));
+    }
+
+    private void checkIfIntersectedTaskExist(Task currentTask) throws ManagerSaveException {
+        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(currentTask, task)).findFirst();
+        if (intersectedTask.isPresent()) {
+            throw new ManagerSaveException("Пересечение задач", new Exception());
+        }
     }
 
     // -----------------------------------------------------------
@@ -97,12 +104,7 @@ public class InMemoryTaskManager implements TaskManager {
             id = getNewId();
             newTask.setId(id);
         }
-
-        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(newTask, task)).findFirst();
-        if (intersectedTask.isPresent()) {
-            throw new ManagerSaveException("Пересечение задач", new Exception());
-        }
-
+        checkIfIntersectedTaskExist(newTask);
         taskHashMap.put(id, newTask);
         if (newTask.getStartTime() != null) prioritizedTasks.add(newTask);
 
@@ -111,10 +113,7 @@ public class InMemoryTaskManager implements TaskManager {
     //e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     @Override
     public void updateTask(Task newTask) throws ManagerSaveException {
-        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(newTask, task)).findFirst();
-        if (intersectedTask.isPresent()) {
-            throw new ManagerSaveException("Пересечение задач", new Exception());
-        }
+        checkIfIntersectedTaskExist(newTask);
         prioritizedTasks.remove(taskHashMap.get(newTask.getId()));
         taskHashMap.replace(newTask.getId(), newTask);
         if (newTask.getStartTime() != null) prioritizedTasks.add(newTask);
@@ -178,10 +177,7 @@ public class InMemoryTaskManager implements TaskManager {
             id = getNewId();
             newSubtask.setId(id);
         }
-        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(newSubtask, task)).findFirst();
-        if (intersectedTask.isPresent()) {
-            throw new ManagerSaveException("Пересечение задач", new Exception());
-        }
+        checkIfIntersectedTaskExist(newSubtask);
 
         subtaskHashMap.put(id, newSubtask);
         if (newSubtask.getStartTime() != null) prioritizedTasks.add(newSubtask);
@@ -198,10 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
     //e. Обновление подзадачи. Новая версия объекта с верным идентификатором передаётся в виде параметра.
     @Override
     public void updateSubtask(Subtask newSubtask) throws ManagerSaveException {
-        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(newSubtask, task)).findFirst();
-        if (intersectedTask.isPresent()) {
-            throw new ManagerSaveException("Пересечение задач", new Exception());
-        }
+        checkIfIntersectedTaskExist(newSubtask);
         prioritizedTasks.remove(subtaskHashMap.get(newSubtask.getId()));
         subtaskHashMap.replace(newSubtask.getId(), newSubtask);
         if (newSubtask.getStartTime() != null) prioritizedTasks.add(newSubtask);
