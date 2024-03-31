@@ -18,7 +18,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TasksHandler implements HttpHandler {
@@ -29,10 +31,26 @@ public class TasksHandler implements HttpHandler {
         this.taskManager = taskManager;
     }
 
+
+    public Map<String, String> queryToMap(String query) {
+        if(query == null) {
+            return null;
+        }
+        Map<String, String> result = new HashMap<>();
+        for (String param : query.split("&")) {
+            String[] entry = param.split("=");
+            if (entry.length > 1) {
+                result.put(entry[0], entry[1]);
+            }else{
+                result.put(entry[0], "");
+            }
+        }
+        return result;
+    }
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod(), body);
+        Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestURI().getQuery(), exchange.getRequestMethod(), body);
         System.out.println("GETCOLLECTION" + endpoint.toString());
 
         switch (endpoint) {
@@ -47,6 +65,7 @@ public class TasksHandler implements HttpHandler {
                 break;
             }
             case ADD: {
+                System.out.println("try add task");
                 handleAddTask(exchange);
                 break;
             }
@@ -55,6 +74,7 @@ public class TasksHandler implements HttpHandler {
                 break;
             }
             case UPDATE: {
+                System.out.println("try add task");
                 handleUpdateTask(exchange);
                 break;
             }
@@ -114,8 +134,8 @@ public class TasksHandler implements HttpHandler {
     }
 
     private void handleDeleteTask(HttpExchange exchange) throws IOException {
-        String[] pathParts = exchange.getRequestURI().getPath().split("/");
-        int id = Integer.parseInt(pathParts[1]);
+        Map<String, String> params = queryToMap(exchange.getRequestURI().getQuery());
+        int id = Integer.parseInt(params.get("id"));
         try {
             taskManager.deleteTask(id);
             writeResponse(exchange, "Deleted", 201);
@@ -164,7 +184,7 @@ public class TasksHandler implements HttpHandler {
         exchange.close();
     }
 
-    private Endpoint getEndpoint(String requestPath, String requestMethod, String body) {
+    private Endpoint getEndpoint(String requestPath, String requestParams, String requestMethod, String body) {
         String[] pathParts = requestPath.split("/");
         // анализируем какой метод TaskManagera нужен
         switch (requestMethod) {
@@ -184,26 +204,21 @@ public class TasksHandler implements HttpHandler {
                 return Endpoint.UNKNOWN;
             }
             case "POST": {
-                JsonElement jsonElement = JsonParser.parseString(body);
-                if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
-                    return Endpoint.UNKNOWN;
-                }
-                JsonObject jsonObject = jsonElement.getAsJsonObject();
-                if (jsonObject.has("id"))
-                    return Endpoint.UPDATE;
-                else
+
+                Map<String, String> params = queryToMap(requestParams);
+                if (pathParts.length == 2)
                     return Endpoint.ADD;
+                if (params.containsKey("id"))
+                    return Endpoint.UPDATE;
+                return Endpoint.UNKNOWN;
             }
             case "DELETE": {
                 if (pathParts.length == 2) {
-                    try {
-                        Integer.parseInt(pathParts[1]);
-                    } catch (NumberFormatException e) {
-                        return Endpoint.UNKNOWN;
-                    }
-                    // вернуть одну задачу
-                    return Endpoint.DELETE;
+                    Map<String, String> params = queryToMap(requestParams);
+                    if (params.containsKey("id"))
+                        return Endpoint.DELETE;
                 }
+                return Endpoint.UNKNOWN;
             }
             default:
                 return Endpoint.UNKNOWN;

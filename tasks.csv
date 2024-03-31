@@ -12,4 +12,4 @@ id,type,name,status,description,duration,startTime,epic or subtasks
 5,EPIC,Эпик 2,NEW,Описание Эпика 2,60,28.03.2024 15:00,9 10 
 6,EPIC,Эпик 3,NEW,Описание Эпика 3,60,28.03.2024 17:00,11 12 
 
-1,2
+empty history
