@@ -7,12 +7,15 @@ import com.google.gson.stream.JsonWriter;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import main.TaskManager;
+import main.models.ManagerSaveException;
 import main.models.Task;
+import com.sun.net.httpserver.Headers;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -21,23 +24,26 @@ import java.util.stream.Collectors;
 public class TasksHandler implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final TaskManager taskManager;
+
     public TasksHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod(), body);
+        System.out.println("GETCOLLECTION" + endpoint.toString());
 
-        JsonElement jsonElement = JsonParser.parseString(body);
         switch (endpoint) {
             case GET_COLLECTION: {
                 handleGetTasks(exchange);
+                System.out.println("Get tasks");
                 break;
             }
             case GET_ONE: {
                 handleGetTask(exchange);
-
+                System.out.println("Get one task");
                 break;
             }
             case ADD: {
@@ -60,30 +66,87 @@ public class TasksHandler implements HttpHandler {
     private void handleGetTasks(HttpExchange exchange) throws IOException {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
-        gsonBuilder.registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter());
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalTimeTypeAdapter());
         Gson gson = gsonBuilder.create();
+        Headers headers = exchange.getResponseHeaders();
+        headers.set("Content-Type", "application/json;charset=UTF-8");
         String response = gson.toJson(taskManager.getTasks());
         writeResponse(exchange, response, 200);
+
     }
 
     private void handleGetTask(HttpExchange exchange) throws IOException {
-
+        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        int taskId = Integer.parseInt(pathParts[2]);
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setPrettyPrinting();
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalTimeTypeAdapter());
+        Gson gson = gsonBuilder.create();
+        Headers headers = exchange.getResponseHeaders();
+        headers.set("Content-Type", "application/json;charset=UTF-8");
+        Task task = taskManager.getTask(taskId);
+        if (task != null) {
+            String response = gson.toJson(taskManager.getTask(taskId));
+            writeResponse(exchange, response, 200);
+        } else {
+            writeResponse(exchange, "Not Found", 404);
+        }
     }
 
     private void handleAddTask(HttpExchange exchange) throws IOException {
+        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        JsonElement jsonElement = JsonParser.parseString(body);
+        if(!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
+            writeResponse(exchange, "Not Acceptable", 406);
+        }
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        Gson gson = new Gson();
+        Task task = gson.fromJson(jsonObject, Task.class);
+        try {
+            taskManager.addTask(task);
+            writeResponse(exchange, "Added", 201);
+        }
+        catch (ManagerSaveException ex)
+        {
+            writeResponse(exchange, "Not Acceptable", 406);
+        }
 
     }
 
     private void handleDeleteTask(HttpExchange exchange) throws IOException {
+        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        int id = Integer.parseInt(pathParts[1]);
+        try {
+            taskManager.deleteTask(id);
+            writeResponse(exchange, "Deleted", 201);
+        }
+        catch (ManagerSaveException ex)
+        {
+            writeResponse(exchange, "Not Found", 404);
+        }
 
     }
 
     private void handleUpdateTask(HttpExchange exchange) throws IOException {
-
+        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        JsonElement jsonElement = JsonParser.parseString(body);
+        if(!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
+            writeResponse(exchange, "Not Acceptable", 406);
+        }
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        Gson gson = new Gson();
+        Task task = gson.fromJson(jsonObject, Task.class);
+        try {
+            taskManager.updateTask(task);
+            writeResponse(exchange, "Updated", 201);
+        }
+        catch (ManagerSaveException ex)
+        {
+            writeResponse(exchange, "Not Acceptable", 406);
+        }
     }
 
-    private String TaskToJson(Task task)
-    {
+    private String TaskToJson(Task task) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
         gsonBuilder.registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter());
@@ -100,49 +163,47 @@ public class TasksHandler implements HttpHandler {
         }
         exchange.close();
     }
+
     private Endpoint getEndpoint(String requestPath, String requestMethod, String body) {
         String[] pathParts = requestPath.split("/");
         // анализируем какой метод TaskManagera нужен
-        switch (requestMethod)
-        {
-            case "GET":
-            {
+        switch (requestMethod) {
+            case "GET": {
                 // вернуть json задач
                 if (pathParts.length == 2)
                     return Endpoint.GET_COLLECTION;
                 if (pathParts.length == 3) {
                     try {
-                        int id = Integer.parseInt(pathParts[2]);
+                        Integer.parseInt(pathParts[2]);
                     } catch (NumberFormatException e) {
                         return Endpoint.UNKNOWN;
                     }
                     // вернуть одну задачу
                     return Endpoint.GET_ONE;
                 }
+                return Endpoint.UNKNOWN;
             }
-            case "POST":
-            {
+            case "POST": {
                 JsonElement jsonElement = JsonParser.parseString(body);
                 if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
                     return Endpoint.UNKNOWN;
                 }
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
                 if (jsonObject.has("id"))
-                    return  Endpoint.UPDATE;
+                    return Endpoint.UPDATE;
                 else
                     return Endpoint.ADD;
             }
-            case "DELETE":
-            {
-                JsonElement jsonElement = JsonParser.parseString(body);
-                if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
-                    return Endpoint.UNKNOWN;
+            case "DELETE": {
+                if (pathParts.length == 2) {
+                    try {
+                        Integer.parseInt(pathParts[1]);
+                    } catch (NumberFormatException e) {
+                        return Endpoint.UNKNOWN;
+                    }
+                    // вернуть одну задачу
+                    return Endpoint.DELETE;
                 }
-                JsonObject jsonObject = jsonElement.getAsJsonObject();
-                if (jsonObject.has("id"))
-                    return  Endpoint.DELETE;
-                else
-                    return Endpoint.UNKNOWN;
             }
             default:
                 return Endpoint.UNKNOWN;
@@ -156,16 +217,16 @@ public class TasksHandler implements HttpHandler {
 class TaskListTypeToken extends TypeToken<List<Task>> {
 }
 
-class LocalTimeTypeAdapter extends TypeAdapter<LocalTime> {
+class LocalTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     @Override
-    public void write(final JsonWriter jsonWriter, final LocalTime localTime) throws IOException {
+    public void write(final JsonWriter jsonWriter, final LocalDateTime localTime) throws IOException {
         jsonWriter.value(localTime.format(timeFormatter));
     }
 
     @Override
-    public LocalTime read(final JsonReader jsonReader) throws IOException {
-        return LocalTime.parse(jsonReader.nextString(), timeFormatter);
+    public LocalDateTime read(final JsonReader jsonReader) throws IOException {
+        return LocalDateTime.parse(jsonReader.nextString(), timeFormatter);
     }
 }

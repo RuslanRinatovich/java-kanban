@@ -122,8 +122,16 @@ public class InMemoryTaskManager implements TaskManager {
     // f. Удаление по идентификатору.
     @Override
     public void deleteTask(int id) throws ManagerSaveException {
-        prioritizedTasks.remove(taskHashMap.get(id));
-        taskHashMap.remove(id);
+
+        if (taskHashMap.containsKey(id))
+        {
+            prioritizedTasks.remove(taskHashMap.get(id));
+            taskHashMap.remove(id);
+        }
+        else
+        {
+            throw new ManagerSaveException("Указанного id не существует", new Exception());
+        }
     }
 
     // g. изменение статуса задачи

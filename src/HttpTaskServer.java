@@ -24,7 +24,7 @@ public class HttpTaskServer {
 
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
         // завершаем работу сервера для корректной работы тренажёра
-        httpServer.stop(1);
+       // httpServer.stop(1);
     }
 
    static void setUp() throws ManagerSaveException {
