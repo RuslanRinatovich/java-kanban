@@ -4,6 +4,7 @@ import main.models.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 public interface TaskManager {
     Map<Integer, Task> getTaskHashMap();
@@ -13,6 +14,9 @@ public interface TaskManager {
     Map<Integer, Subtask> getSubtaskHashMap();
 
     List<Task> getHistory();
+
+
+    TreeSet<Task> getPrioritizedTasks();
 
     // -----------------------------------------------------------
     // Методы для работы с задачами
