@@ -47,7 +47,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     private boolean isTasksIntersected(Task firstTask, Task secondTask) {
         return (firstTask.getEndTime().isAfter(secondTask.getStartTime()) && firstTask.getEndTime().isBefore(secondTask.getEndTime()) ||
-                secondTask.getEndTime().isAfter(firstTask.getStartTime()) && secondTask.getEndTime().isBefore(firstTask.getEndTime()));
+                secondTask.getEndTime().isAfter(firstTask.getStartTime()) && secondTask.getEndTime().isBefore(firstTask.getEndTime()) ||
+                firstTask.getStartTime().isEqual(secondTask.getStartTime()) && firstTask.getEndTime().isEqual(secondTask.getEndTime()) );
     }
 
     private void checkIfIntersectedTaskExist(Task currentTask) throws ManagerSaveException {
