@@ -49,9 +49,11 @@ public class TasksHandler implements HttpHandler {
     }
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestURI().getQuery(), exchange.getRequestMethod(), body);
-        System.out.println("GETCOLLECTION" + endpoint.toString());
+        //String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        //System.out.println(body);
+        Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(),
+                exchange.getRequestURI().getQuery(), exchange.getRequestMethod());
+        System.out.println(endpoint.toString());
 
         switch (endpoint) {
             case GET_COLLECTION: {
@@ -66,16 +68,23 @@ public class TasksHandler implements HttpHandler {
             }
             case ADD: {
                 System.out.println("try add task");
+
                 handleAddTask(exchange);
                 break;
             }
             case DELETE: {
+                System.out.println("try delete task");
                 handleDeleteTask(exchange);
                 break;
             }
             case UPDATE: {
-                System.out.println("try add task");
+                System.out.println("try update task");
                 handleUpdateTask(exchange);
+                break;
+
+            }
+            case UNKNOWN: {
+                writeResponse(exchange, "Такого эндпоинта не существует", 404);
                 break;
             }
             default:
@@ -115,12 +124,17 @@ public class TasksHandler implements HttpHandler {
 
     private void handleAddTask(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        System.out.println(body);
         JsonElement jsonElement = JsonParser.parseString(body);
         if(!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
             writeResponse(exchange, "Not Acceptable", 406);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        Gson gson = new Gson();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setPrettyPrinting();
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalTimeTypeAdapter());
+        Gson gson = gsonBuilder.create();
+
         Task task = gson.fromJson(jsonObject, Task.class);
         try {
             taskManager.addTask(task);
@@ -184,7 +198,7 @@ public class TasksHandler implements HttpHandler {
         exchange.close();
     }
 
-    private Endpoint getEndpoint(String requestPath, String requestParams, String requestMethod, String body) {
+    private Endpoint getEndpoint(String requestPath, String requestParams, String requestMethod) {
         String[] pathParts = requestPath.split("/");
         // анализируем какой метод TaskManagera нужен
         switch (requestMethod) {
@@ -204,19 +218,17 @@ public class TasksHandler implements HttpHandler {
                 return Endpoint.UNKNOWN;
             }
             case "POST": {
-
-                Map<String, String> params = queryToMap(requestParams);
                 if (pathParts.length == 2)
                     return Endpoint.ADD;
+                Map<String, String> params = queryToMap(requestParams);
                 if (params.containsKey("id"))
                     return Endpoint.UPDATE;
                 return Endpoint.UNKNOWN;
             }
             case "DELETE": {
-                if (pathParts.length == 2) {
-                    Map<String, String> params = queryToMap(requestParams);
-                    if (params.containsKey("id"))
-                        return Endpoint.DELETE;
+                Map<String, String> params = queryToMap(requestParams);
+                if (pathParts.length == 2 && params.containsKey("id") ){
+                    return Endpoint.DELETE;
                 }
                 return Endpoint.UNKNOWN;
             }
