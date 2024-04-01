@@ -166,8 +166,8 @@ public class FileBackedTaskManagerTest {
 
     @Test
     public void deleteSubtask() throws ManagerSaveException {
-        fileBackedTaskManager.deleteSubtask(7);
-        Subtask expected = fileBackedTaskManager.getSubtask(1);
+        fileBackedTaskManager.deleteSubtask(3);
+        Subtask expected = fileBackedTaskManager.getSubtask(3);
         assertNull(expected, "Подзадача не удалена.");
     }
 

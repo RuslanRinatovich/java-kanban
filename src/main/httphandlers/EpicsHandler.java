@@ -139,7 +139,9 @@ public class EpicsHandler implements HttpHandler {
         Gson gson = getDefaultGson();
         Epic epic = gson.fromJson(jsonObject, Epic.class);
         System.out.println("Эпик " + epic.toString());
+
         try {
+            System.out.println("Эпик " + epic.toString());
             taskManager.addEpic(epic);
             writeResponse(exchange, "Added", 201);
         }
@@ -174,6 +176,7 @@ public class EpicsHandler implements HttpHandler {
     private Gson getDefaultGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
+        gsonBuilder.serializeNulls();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter());
         return gsonBuilder.create();
     }

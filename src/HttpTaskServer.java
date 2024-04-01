@@ -44,6 +44,7 @@ public class HttpTaskServer {
         Epic epic2 = new Epic("Эпик 2", "Описание Эпика 2",  Status.NEW,Duration.ofMinutes(0), LocalDateTime.of(2024,1,1,0,0), new ArrayList<>());
         Epic epic3 = new Epic("Эпик 3", "Описание Эпика 3",  Status.NEW, Duration.ofMinutes(0),LocalDateTime.of(2024,1,1,0,0), new ArrayList<>());
 
+
         taskManager.addEpic(epic1);//4
         taskManager.addEpic(epic2);//5
         taskManager.addEpic(epic3);//6
@@ -60,6 +61,8 @@ public class HttpTaskServer {
         taskManager.addSubtask(subtask4);//10
         taskManager.addSubtask(subtask5);//11
         taskManager.addSubtask(subtask6);//12
+       Epic epic4 = new Epic("Эпик 4", "Описание Эпика 4",  Status.NEW, Duration.ofMinutes(0), null, new ArrayList<>());
+       taskManager.addEpic(epic4);//13
 
     }
 }
