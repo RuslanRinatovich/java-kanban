@@ -227,25 +227,3 @@ public class TasksHandler implements HttpHandler {
 class TaskListTypeToken extends TypeToken<List<Task>> {
 }
 
-class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-
-    @Override
-    public void write(final JsonWriter jsonWriter, final LocalDateTime localDateTime) throws IOException {
-        if (localDateTime == null) {
-            jsonWriter.nullValue();
-        } else {
-            jsonWriter.value(localDateTime.format(timeFormatter));
-        }
-    }
-    @Override
-    public LocalDateTime read(final JsonReader jsonReader) throws IOException {
-        //System.out.println();
-        if (jsonReader.peek() == JsonToken.NULL) {
-           jsonReader.nextNull();
-            return null;
-        } else {
-            return LocalDateTime.parse(jsonReader.nextString(), timeFormatter);
-        }
-    }
-}

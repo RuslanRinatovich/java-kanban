@@ -2,7 +2,6 @@ id,type,name,status,description,duration,startTime,epic or subtasks
 1,TASK,Задача 1,NEW,Описание задачи 1,30,null
 2,TASK,Задача 2,NEW,Описание задачи 2,30,26.03.2024 11:00
 3,TASK,Задача 3,NEW,Описание задачи 3,30,28.03.2024 12:00
-60,TASK,Задача 5,NEW,Описание задачи 4,null,null
 7,SUBTASK,Подзадача 1,NEW,Описание подзадачи 1,30,28.03.2024 13:00
 8,SUBTASK,Подзадача 2,NEW,Описание подзадачи 2,30,28.03.2024 14:00
 9,SUBTASK,Подзадача 3,NEW,Описание подзадачи 3,30,28.03.2024 15:00
@@ -14,4 +13,4 @@ id,type,name,status,description,duration,startTime,epic or subtasks
 6,EPIC,Эпик 3,NEW,Описание Эпика 3,60,28.03.2024 17:00,11 12 
 13,EPIC,Эпик 4,NEW,Описание Эпика 4,0,null,
 
-1,2,7,8,4,5
+1,2,8,4,5,7
