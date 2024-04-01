@@ -88,6 +88,22 @@ public class HttpTaskServerTest {
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(expected, actual, "Задачи не совпали");
     }
+
+    // получение одной задачи с неправильным id 100
+    @Test
+    void CheckGetTasksWithNonExistId100ReturnCode404() throws IOException, InterruptedException {
+        URI uri = URI.create("http://localhost:8080/tasks/100");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int expectedResponseCode = 404;
+        int actualResponseCode = response.statusCode();
+        assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
+    }
     // получение всех подзадач
     @Test
     void CheckGetSubtasksReturnCode200AndSubtasksCountEqualToSix() throws IOException, InterruptedException {
@@ -123,9 +139,23 @@ public class HttpTaskServerTest {
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(expected, actual, "Задачи не совпали");
     }
+    // получение одной подзадачи с неправильным id 100
+    @Test
+    void CheckGetSubTasksWithNonExistId100ReturnCode404() throws IOException, InterruptedException {
+        URI uri = URI.create("http://localhost:8080/subtasks/100");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
 
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int expectedResponseCode = 404;
+        int actualResponseCode = response.statusCode();
+        assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
+    }
 
-    // получение всех подзадач
+    // получение всех эпиков
     @Test
     void CheckGetEpicsReturnCode200AndEpicsCountEqualToFour() throws IOException, InterruptedException {
         URI uri = URI.create("http://localhost:8080/epics");
@@ -142,7 +172,7 @@ public class HttpTaskServerTest {
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(4, taskList.size(), "Не верное количество задач");
     }
-    // получение одной подзадачи с id 7
+    // получение одного эпика с id 13
     @Test
     void CheckGetEpicWithId13ReturnCode200AndActualTask() throws IOException, InterruptedException {
         URI uri = URI.create("http://localhost:8080/epics/13");
@@ -161,6 +191,89 @@ public class HttpTaskServerTest {
         assertEquals(expected, actual, "Задачи не совпали");
     }
 
+
+    // получение одной эпика с неправильным id 100
+    @Test
+    void CheckGetEpicWithNonExistId100ReturnCode404() throws IOException, InterruptedException {
+        URI uri = URI.create("http://localhost:8080/epics/100");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int expectedResponseCode = 404;
+        int actualResponseCode = response.statusCode();
+        assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
+    }
+
+    @Test
+    void CheckSendRequestBadURIReturnCode400() throws IOException, InterruptedException {
+        URI uri = URI.create("http://localhost:8080/blelel");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int expectedResponseCode = 404;
+        int actualResponseCode = response.statusCode();
+        assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
+    }
+
+    @Test
+    void CheckGetHistorySize() throws IOException, InterruptedException {
+        URI uri = URI.create("http://localhost:8080/history");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int expectedResponseCode = 200;
+        int actualResponseCode = response.statusCode();
+        List<Task> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
+        assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
+        assertEquals(6, taskList.size(), "Не верное количество задач");
+    }
+
+    @Test
+    void CheckGetPriorityFirstTaskId2() throws IOException, InterruptedException {
+        URI uri = URI.create("http://localhost:8080/prioritized");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int expectedResponseCode = 200;
+        int actualResponseCode = response.statusCode();
+        List<Task> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
+        Task expected = new Task(2,"Задача 2", "Описание задачи 2", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024, 3, 26, 11, 0));
+        assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
+        assertEquals(expected, taskList.get(0), "Разные задачи");
+    }
+    @Test
+    void CheckGetPriorityLastTaskHasId12() throws IOException, InterruptedException {
+        URI uri = URI.create("http://localhost:8080/prioritized");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int expectedResponseCode = 200;
+        int actualResponseCode = response.statusCode();
+        List<Task> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
+        int expected = 12;
+        assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
+        assertEquals(expected, taskList.get(7).getId(), "Разные задачи");
+    }
 
 }
 

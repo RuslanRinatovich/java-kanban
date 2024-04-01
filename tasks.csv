@@ -13,4 +13,4 @@ id,type,name,status,description,duration,startTime,epic or subtasks
 6,EPIC,Эпик 3,NEW,Описание Эпика 3,60,28.03.2024 17:00,11 12 
 13,EPIC,Эпик 4,NEW,Описание Эпика 4,0,null,
 
-1,2,7,8,4,5,13
+1,2,7,8,4,5
