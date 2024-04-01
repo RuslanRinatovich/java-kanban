@@ -1,15 +1,12 @@
 package main.httphandlers;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import main.TaskManager;
+import main.models.Epic;
 import main.models.ManagerSaveException;
-import main.models.Task;
+import main.models.Subtask;
 import com.sun.net.httpserver.Headers;
 
 import java.io.IOException;
@@ -17,23 +14,23 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-public class TasksHandler implements HttpHandler {
+public class EpicsHandler implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final TaskManager taskManager;
 
-    public TasksHandler(TaskManager taskManager) {
+    public EpicsHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
 
     // метод для разбора строки из параметров на пары ключ и значение в HashMap
     public Map<String, String> queryToMap(String query) {
-        if (query == null) {
+        if(query == null) {
             return null;
         }
         Map<String, String> result = new HashMap<>();
@@ -41,44 +38,43 @@ public class TasksHandler implements HttpHandler {
             String[] entry = param.split("=");
             if (entry.length > 1) {
                 result.put(entry[0], entry[1]);
-            } else {
+            }else{
                 result.put(entry[0], "");
             }
         }
         return result;
     }
-
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        System.out.println(exchange.getRequestURI());
+        //System.out.println(exchange.getRequestURI());
         Endpoint endpoint = getEndpoint(String.valueOf(exchange.getRequestURI()), exchange.getRequestMethod());
         System.out.println(endpoint.toString());
 
         switch (endpoint) {
             case GET_COLLECTION: {
-                handleGetTasks(exchange);
-                System.out.println("Get tasks");
+                handleGetEpics(exchange);
+                System.out.println("Get epics");
                 break;
             }
             case GET_ONE: {
-                handleGetTask(exchange);
-                System.out.println("Get one task");
+                handleGetEpic(exchange);
+                System.out.println("Get one epic");
+                break;
+            }
+            case GET_EPIC_SUBTASKS: {
+                handleGetEpicSubtasks(exchange);
+                System.out.println("Get epics subtasks");
                 break;
             }
             case ADD: {
-                System.out.println("try add task");
-                handleAddTask(exchange);
+                System.out.println("try add epic");
+                handleAddEpic(exchange);
                 break;
             }
             case DELETE: {
-                System.out.println("try delete task");
-                handleDeleteTask(exchange);
-                break;
-            }
-            case UPDATE: {
-                System.out.println("try update task");
-                handleUpdateTask(exchange);
+                System.out.println("try delete epic");
+                handleDeleteEpic(exchange);
                 break;
             }
             case UNKNOWN: {
@@ -91,84 +87,87 @@ public class TasksHandler implements HttpHandler {
     }
 
     // обработчик запроса на получение всех задач
-    private void handleGetTasks(HttpExchange exchange) throws IOException {
+    private void handleGetEpics(HttpExchange exchange) throws IOException {
         Gson gson = getDefaultGson();
         Headers headers = exchange.getResponseHeaders();
         headers.set("Content-Type", "application/json;charset=UTF-8");
-        String response = gson.toJson(taskManager.getTasks());
+        String response = gson.toJson(taskManager.getEpics());
         writeResponse(exchange, response, 200);
 
     }
-
     // обработчик запроса на получение одной задачи
-    private void handleGetTask(HttpExchange exchange) throws IOException {
+    private void handleGetEpic(HttpExchange exchange) throws IOException {
         String[] pathParts = exchange.getRequestURI().getPath().split("/");
-        int taskId = Integer.parseInt(pathParts[2]);
+        int epicId = Integer.parseInt(pathParts[2]);
         Gson gson = getDefaultGson();
         Headers headers = exchange.getResponseHeaders();
         headers.set("Content-Type", "application/json;charset=UTF-8");
-        Task task = taskManager.getTask(taskId);
-        if (task != null) {
-            String response = gson.toJson(taskManager.getTask(taskId));
+        Epic epic = taskManager.getEpic(epicId);
+        if (epic != null) {
+            String response = gson.toJson(epic);
             writeResponse(exchange, response, 200);
         } else {
             writeResponse(exchange, "Not Found", 404);
         }
     }
 
+    // обработчик запроса на получение одной подзадач эпика
+    private void handleGetEpicSubtasks(HttpExchange exchange) throws IOException {
+        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        int epicId = Integer.parseInt(pathParts[2]);
+        Gson gson = getDefaultGson();
+        Headers headers = exchange.getResponseHeaders();
+        headers.set("Content-Type", "application/json;charset=UTF-8");
+        Epic epic = taskManager.getEpic(epicId);
+        if (epic != null) {
+            List<Subtask> subtasks = taskManager.getSubtasks().stream().filter(subtask -> epic.getSubtasksIds().contains(subtask.getId())).collect(Collectors.toList());
+            String response = gson.toJson(subtasks);
+            writeResponse(exchange, response, 200);
+        } else {
+            writeResponse(exchange, "Not Found", 404);
+        }
+    }
     // обработчик запроса на добавление одной задачи
-    private void handleAddTask(HttpExchange exchange) throws IOException {
+    private void handleAddEpic(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         System.out.println(body);
         JsonElement jsonElement = JsonParser.parseString(body);
-
-        if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
+        if(!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
             writeResponse(exchange, "Not Acceptable", 406);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         Gson gson = getDefaultGson();
-        Task task = gson.fromJson(jsonObject, Task.class);
+        Epic epic = gson.fromJson(jsonObject, Epic.class);
+        System.out.println("Эпик " + epic.toString());
         try {
-            taskManager.addTask(task);
+            taskManager.addEpic(epic);
             writeResponse(exchange, "Added", 201);
-        } catch (ManagerSaveException ex) {
+        }
+        catch (ManagerSaveException ex)
+        {
             System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Acceptable", 406);
         }
+        catch (Exception ex)
+        {
+            System.out.println(ex.getMessage());
+        }
 
     }
-
     // обработчик запроса на удаление одной задачи
-    private void handleDeleteTask(HttpExchange exchange) throws IOException {
+    private void handleDeleteEpic(HttpExchange exchange) throws IOException {
         Map<String, String> params = queryToMap(exchange.getRequestURI().getQuery());
         int id = Integer.parseInt(params.get("id"));
         try {
-            taskManager.deleteTask(id);
+            taskManager.deleteEpic(id);
             writeResponse(exchange, "Deleted", 201);
-        } catch (ManagerSaveException ex) {
+        }
+        catch (ManagerSaveException ex)
+        {
             System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Found", 404);
         }
 
-    }
-
-    // обработчик запроса на обновление одной задачи
-    private void handleUpdateTask(HttpExchange exchange) throws IOException {
-        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        JsonElement jsonElement = JsonParser.parseString(body);
-        if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
-            writeResponse(exchange, "Not Acceptable", 406);
-        }
-        JsonObject jsonObject = jsonElement.getAsJsonObject();
-        Gson gson = getDefaultGson();
-        Task task = gson.fromJson(jsonObject, Task.class);
-        try {
-            taskManager.updateTask(task);
-            writeResponse(exchange, "Updated", 201);
-        } catch (ManagerSaveException ex) {
-            System.out.println(ex.getMessage());
-            writeResponse(exchange, "Not Acceptable", 406);
-        }
     }
 
     // Настройка json
@@ -176,7 +175,6 @@ public class TasksHandler implements HttpHandler {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter());
-        gsonBuilder.serializeNulls();
         return gsonBuilder.create();
     }
 
@@ -197,21 +195,21 @@ public class TasksHandler implements HttpHandler {
         switch (requestMethod) {
             case "GET": {
                 // вернуть json задач
-                if (Pattern.matches("^/tasks$", requestURI))
+                if (Pattern.matches("^/epics$", requestURI))
                     return Endpoint.GET_COLLECTION;
-                if (Pattern.matches("^/tasks/\\d+$", requestURI))
+                if (Pattern.matches("^/epics/\\d+$", requestURI))
                     return Endpoint.GET_ONE;
+                if (Pattern.matches("^/epics/\\d+/subtasks$", requestURI))
+                    return Endpoint.GET_EPIC_SUBTASKS;
                 return Endpoint.UNKNOWN;
             }
             case "POST": {
-                if (Pattern.matches("^/tasks$", requestURI))
+                if (Pattern.matches("^/epics$", requestURI))
                     return Endpoint.ADD;
-                if (Pattern.matches("^/tasks\\?id=\\d+$", requestURI))
-                    return Endpoint.UPDATE;
                 return Endpoint.UNKNOWN;
             }
             case "DELETE": {
-                if (Pattern.matches("^/tasks\\?id=\\d+$", requestURI))
+                if (Pattern.matches("^/epics\\?id=\\d+$", requestURI))
                     return Endpoint.DELETE;
                 return Endpoint.UNKNOWN;
             }
@@ -219,33 +217,10 @@ public class TasksHandler implements HttpHandler {
                 return Endpoint.UNKNOWN;
 
         }
-
-
     }
 }
 
-class TaskListTypeToken extends TypeToken<List<Task>> {
-}
 
-class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-    @Override
-    public void write(final JsonWriter jsonWriter, final LocalDateTime localDateTime) throws IOException {
-        if (localDateTime == null) {
-            jsonWriter.nullValue();
-        } else {
-            jsonWriter.value(localDateTime.format(timeFormatter));
-        }
-    }
-    @Override
-    public LocalDateTime read(final JsonReader jsonReader) throws IOException {
-        //System.out.println();
-        if (jsonReader.peek() == JsonToken.NULL) {
-           jsonReader.nextNull();
-            return null;
-        } else {
-            return LocalDateTime.parse(jsonReader.nextString(), timeFormatter);
-        }
-    }
-}
+
+

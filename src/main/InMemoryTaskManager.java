@@ -25,13 +25,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     static {
-        try(FileInputStream ins = new FileInputStream("log.config")){
+        try (FileInputStream ins = new FileInputStream("log.config")) {
             LogManager.getLogManager().readConfiguration(ins);
             LOGGER = Logger.getLogger(Main.class.getName());
-        }catch (Exception ignore){
+        } catch (Exception ignore) {
             ignore.printStackTrace();
         }
     }
+
     @Override
     public Map<Integer, Task> getTaskHashMap() {
         return taskHashMap;
@@ -62,43 +63,40 @@ public class InMemoryTaskManager implements TaskManager {
     private boolean isTasksIntersected(Task firstTask, Task secondTask) {
         return (firstTask.getEndTime().isAfter(secondTask.getStartTime()) && firstTask.getEndTime().isBefore(secondTask.getEndTime()) ||
                 secondTask.getEndTime().isAfter(firstTask.getStartTime()) && secondTask.getEndTime().isBefore(firstTask.getEndTime()) ||
-                firstTask.getStartTime().isEqual(secondTask.getStartTime()) && firstTask.getEndTime().isEqual(secondTask.getEndTime()) );
+                firstTask.getStartTime().isEqual(secondTask.getStartTime()) && firstTask.getEndTime().isEqual(secondTask.getEndTime()));
     }
 
     private void checkIfIntersectedTaskExist(Task currentTask) throws ManagerSaveException {
         List<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(currentTask, task)).collect(Collectors.toList());
-        if (!intersectedTask.isEmpty())
-        {
+        if (!intersectedTask.isEmpty()) {
 
-            if (intersectedTask.size() > 1)
-            {
+            if (intersectedTask.size() > 1) {
                 LOGGER.log(Level.INFO, currentTask.toString());
-                for (Task t: intersectedTask ) {
+                for (Task t : intersectedTask) {
                     LOGGER.log(Level.INFO, t.toString());
                 }
-                LOGGER.log(Level.WARNING , "Пересечение при добавлении");
-               throw new ManagerSaveException("Пересечение при добавлении", new Exception());
+                LOGGER.log(Level.WARNING, "Пересечение при добавлении");
+                throw new ManagerSaveException("Пересечение при добавлении", new Exception());
             }
             // если вы выборке только одна задача
             // случай пересечения с самим собой при обновлении
             int id = intersectedTask.get(0).getId();
-            if (id != currentTask.getId())
-            {
+            if (id != currentTask.getId()) {
                 LOGGER.log(Level.INFO, currentTask.toString());
-                for (Task t: intersectedTask ) {
+                for (Task t : intersectedTask) {
                     LOGGER.log(Level.INFO, t.toString());
                 }
-                LOGGER.log(Level.WARNING , "Пересечение при обновлении");
+                LOGGER.log(Level.WARNING, "Пересечение при обновлении");
                 throw new ManagerSaveException("Пересечение при обновлении", new Exception());
             }
         }
     }
 
     // проверяет существует ли указанный айди среди айди всех задач, подзадач и эпиков
-    private boolean IsCurrentIdExist(int id)
-    {
+    private boolean IsCurrentIdExist(int id) {
         return (taskHashMap.containsKey(id) || subtaskHashMap.containsKey(id) || epicHashMap.containsKey(id));
     }
+
     // -----------------------------------------------------------
     // Методы для работы с задачами
     public int getId() {
@@ -146,14 +144,14 @@ public class InMemoryTaskManager implements TaskManager {
             id = getNewId();
             newTask.setId(id);
         }
-        if (IsCurrentIdExist(id))
-        {
+        if (IsCurrentIdExist(id)) {
             throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
         }
-        checkIfIntersectedTaskExist(newTask);
+        if (newTask.getStartTime() != null) {
+            checkIfIntersectedTaskExist(newTask);
+            prioritizedTasks.add(newTask);
+        }
         taskHashMap.put(id, newTask);
-        if (newTask.getStartTime() != null) prioritizedTasks.add(newTask);
-
     }
 
     //e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
@@ -169,13 +167,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTask(int id) throws ManagerSaveException {
 
-        if (taskHashMap.containsKey(id))
-        {
+        if (taskHashMap.containsKey(id)) {
             prioritizedTasks.remove(taskHashMap.get(id));
             taskHashMap.remove(id);
-        }
-        else
-        {
+        } else {
             throw new ManagerSaveException("Указанного id не существует", new Exception());
         }
     }
@@ -232,8 +227,7 @@ public class InMemoryTaskManager implements TaskManager {
             newSubtask.setId(id);
         }
         checkIfIntersectedTaskExist(newSubtask);
-        if (IsCurrentIdExist(id))
-        {
+        if (IsCurrentIdExist(id)) {
             throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
         }
         subtaskHashMap.put(id, newSubtask);
@@ -272,9 +266,7 @@ public class InMemoryTaskManager implements TaskManager {
             subtaskHashMap.remove(id);
             updateEpicStatus(epic);
             updateEpicDurationAndTime(epic);
-        }
-        else
-        {
+        } else {
             throw new ManagerSaveException("Указанного id не существует", new Exception());
         }
     }
@@ -336,8 +328,7 @@ public class InMemoryTaskManager implements TaskManager {
             id = getNewId();
             newEpic.setId(id);
         }
-        if (IsCurrentIdExist(id))
-        {
+        if (IsCurrentIdExist(id)) {
             throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
         }
         epicHashMap.put(id, newEpic);

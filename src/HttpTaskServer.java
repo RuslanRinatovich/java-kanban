@@ -1,6 +1,7 @@
 import com.sun.net.httpserver.HttpServer;
 import main.Managers;
 import main.TaskManager;
+import main.httphandlers.EpicsHandler;
 import main.httphandlers.SubtasksHandler;
 import main.httphandlers.TasksHandler;
 import main.models.*;
@@ -22,6 +23,7 @@ public class HttpTaskServer {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TasksHandler(taskManager));
         httpServer.createContext("/subtasks", new SubtasksHandler(taskManager));
+        httpServer.createContext("/epics", new EpicsHandler(taskManager));
         httpServer.start(); // запускаем сервер
 
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
@@ -30,7 +32,7 @@ public class HttpTaskServer {
     }
 
    static void setUp() throws ManagerSaveException {
-        Task task1 = new Task("Задача 1", "Описание задачи 1",  Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,25,10,0));
+        Task task1 = new Task("Задача 1", "Описание задачи 1",  Status.NEW, Duration.ofMinutes(30), null);
         Task task2 = new Task("Задача 2", "Описание задачи 2", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,26,11,0));
         Task task3 = new Task("Задача 3", "Описание задачи 3",  Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,28,12,0));
 
