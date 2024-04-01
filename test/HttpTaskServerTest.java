@@ -90,7 +90,7 @@ public class HttpTaskServerTest {
     }
     // получение всех подзадач
     @Test
-    void CheckGetSubtasksReturnCode200AndSubtasksCountEqualToThree() throws IOException, InterruptedException {
+    void CheckGetSubtasksReturnCode200AndSubtasksCountEqualToSix() throws IOException, InterruptedException {
         URI uri = URI.create("http://localhost:8080/subtasks");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri).header("Accept", "application/json;charset=UTF-8")
@@ -107,7 +107,7 @@ public class HttpTaskServerTest {
     }
     // получение одной подзадачи с id 7
     @Test
-    void CheckGetSubtasksWithId1ReturnCode200AndActualTask() throws IOException, InterruptedException {
+    void CheckGetSubtasksWithId7ReturnCode200AndActualTask() throws IOException, InterruptedException {
         URI uri = URI.create("http://localhost:8080/subtasks/7");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri).header("Accept", "application/json;charset=UTF-8")
@@ -123,5 +123,44 @@ public class HttpTaskServerTest {
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(expected, actual, "Задачи не совпали");
     }
+
+
+    // получение всех подзадач
+    @Test
+    void CheckGetEpicsReturnCode200AndEpicsCountEqualToFour() throws IOException, InterruptedException {
+        URI uri = URI.create("http://localhost:8080/epics");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int expectedResponseCode = 200;
+        int actualResponseCode = response.statusCode();
+        List<Epic> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
+        assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
+        assertEquals(4, taskList.size(), "Не верное количество задач");
+    }
+    // получение одной подзадачи с id 7
+    @Test
+    void CheckGetEpicWithId13ReturnCode200AndActualTask() throws IOException, InterruptedException {
+        URI uri = URI.create("http://localhost:8080/epics/13");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
+                .GET()
+                .build();
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        int expectedResponseCode = 200;
+        int actualResponseCode = response.statusCode();
+        Epic expected = new Epic(13,"Эпик 4", "Описание Эпика 4",  Status.NEW, Duration.ofMinutes(0), null, new ArrayList<>());
+        Epic actual = getDefaultGson().fromJson(response.body(), Epic.class);
+        assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
+        assertEquals(expected, actual, "Задачи не совпали");
+    }
+
+
 }
 
