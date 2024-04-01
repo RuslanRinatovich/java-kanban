@@ -1,24 +1,17 @@
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
-import main.HistoryManager;
-import main.Managers;
-import main.TaskManager;
+import main.HttpTaskServer;
 import main.httphandlers.LocalDateTimeTypeAdapter;
 import main.models.*;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +21,7 @@ class UserListTypeToken extends TypeToken<List<Task>> {
     // здесь ничего не нужно реализовывать
 }
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
+
 public class HttpTaskServerTest {
     HttpTaskServer httpTaskServer;
     @BeforeEach
@@ -102,14 +95,14 @@ public class HttpTaskServerTest {
     void UpdateTasksReturnCode200() throws IOException, InterruptedException {
         URI uri = URI.create("http://localhost:8080/tasks?id=1");
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri).header("Content-Type", "application/json;charset=UTF-8")
+                .uri(uri).header("Accept", "application/json;charset=UTF-8")
                 .POST(HttpRequest.BodyPublishers.ofString("{\n" +
                         "\t\t\"title\": \"Задача 1\",\n" +
-                        "\t\t\"description\": \"Описание задачи 4\",\n" +
+                        "\t\t\"description\": \"Описание задачи 1\",\n" +
                         "\t\t\"id\": 1,\n" +
                         "\t\t\"status\": \"NEW\",\n" +
-                        "\t\t\"duration\": 25,\n" +
-                        "\t\t\"startTime\": \"08.03.2024 13:00\"\n" +
+                        "\t\t\"duration\": 30,\n" +
+                        "\t\t\"startTime\": \"01.03.2024 13:00\"\n" +
                         "\t}"))
                 .build();
         HttpClient client = HttpClient.newHttpClient();

@@ -12,6 +12,16 @@ import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     static Logger LOGGER;
+
+    static {
+        try (FileInputStream ins = new FileInputStream("log.config")) {
+            LogManager.getLogManager().readConfiguration(ins);
+            LOGGER = Logger.getLogger(Main.class.getName());
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
+        }
+    }
+
     protected final HistoryManager historyManager;
     protected final Map<Integer, Task> taskHashMap = new HashMap<>();
     protected final Map<Integer, Epic> epicHashMap = new HashMap<>();
@@ -21,15 +31,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
-    }
-
-    static {
-        try (FileInputStream ins = new FileInputStream("log.config")) {
-            LogManager.getLogManager().readConfiguration(ins);
-            LOGGER = Logger.getLogger(Main.class.getName());
-        } catch (Exception ignore) {
-            ignore.printStackTrace();
-        }
     }
 
     @Override
@@ -157,7 +158,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task newTask) throws ManagerSaveException {
         checkIfIntersectedTaskExist(newTask);
-        prioritizedTasks.remove(taskHashMap.get(newTask.getId()));
+        if (prioritizedTasks.contains(newTask)) {
+            prioritizedTasks.remove(taskHashMap.get(newTask.getId()));
+        }
         taskHashMap.replace(newTask.getId(), newTask);
         if (newTask.getStartTime() != null) prioritizedTasks.add(newTask);
     }

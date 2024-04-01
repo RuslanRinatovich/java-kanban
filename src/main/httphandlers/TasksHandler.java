@@ -154,6 +154,7 @@ public class TasksHandler implements HttpHandler {
 
     // обработчик запроса на обновление одной задачи
     private void handleUpdateTask(HttpExchange exchange) throws IOException {
+
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonElement jsonElement = JsonParser.parseString(body);
         if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
@@ -162,7 +163,9 @@ public class TasksHandler implements HttpHandler {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         Gson gson = getDefaultGson();
         Task task = gson.fromJson(jsonObject, Task.class);
+
         try {
+            System.out.println(task.toString());
             taskManager.updateTask(task);
             writeResponse(exchange, "Updated", 201);
         } catch (ManagerSaveException ex) {
