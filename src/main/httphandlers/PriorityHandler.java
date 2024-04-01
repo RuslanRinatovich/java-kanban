@@ -64,9 +64,7 @@ public class PriorityHandler implements HttpHandler {
         return gsonBuilder.create();
     }
 
-    private void writeResponse(HttpExchange exchange,
-                               String responseString,
-                               int responseCode) throws IOException {
+    private void writeResponse(HttpExchange exchange, String responseString, int responseCode) throws IOException {
         try (OutputStream os = exchange.getResponseBody()) {
             exchange.sendResponseHeaders(responseCode, 0);
             os.write(responseString.getBytes(DEFAULT_CHARSET));
@@ -76,9 +74,8 @@ public class PriorityHandler implements HttpHandler {
 
     private Endpoint getEndpoint(String requestURI, String requestMethod) {
         // анализируем какой метод TaskManagera нужен
-        if (requestMethod.equals("GET")) {// вернуть json задач
-            if (Pattern.matches("^/prioritized$", requestURI))
-                return Endpoint.GET_COLLECTION;
+        if (requestMethod.equals("GET")) {
+            if (Pattern.matches("^/prioritized$", requestURI)) return Endpoint.GET_COLLECTION;
             return Endpoint.UNKNOWN;
         }
         return Endpoint.UNKNOWN;
