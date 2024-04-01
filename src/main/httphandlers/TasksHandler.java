@@ -149,7 +149,6 @@ public class TasksHandler implements HttpHandler {
 
     // обработчик запроса на обновление одной задачи
     private void handleUpdateTask(HttpExchange exchange) throws IOException {
-
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonElement jsonElement = JsonParser.parseString(body);
         if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
@@ -189,8 +188,6 @@ public class TasksHandler implements HttpHandler {
     }
 
     private Endpoint getEndpoint(String requestURI, String requestMethod) {
-//        String[] pathParts = requestPath.split("/");
-//        System.out.println(requestPath+" "+requestMethod +" " +requestParams);
         // анализируем какой метод TaskManagera нужен
         switch (requestMethod) {
             case "GET": {
@@ -222,6 +219,4 @@ public class TasksHandler implements HttpHandler {
     }
 }
 
-class TaskListTypeToken extends TypeToken<List<Task>> {
-}
 
