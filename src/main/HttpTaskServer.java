@@ -6,6 +6,7 @@ import main.Managers;
 import main.TaskManager;
 import main.httphandlers.*;
 import main.models.*;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.time.Duration;
@@ -28,7 +29,7 @@ public class HttpTaskServer {
         // httpServer.stop(1);
     }
 
-    public  void createServer() throws IOException {
+    public void createServer() throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TasksHandler(taskManager));
         httpServer.createContext("/subtasks", new SubtasksHandler(taskManager));
@@ -37,18 +38,18 @@ public class HttpTaskServer {
         httpServer.createContext("/prioritized", new PriorityHandler(taskManager));
     }
 
-    public  void start() {
+    public void start() {
 
         httpServer.start();
     }
 
-    public  void stop() {
+    public void stop() {
         httpServer.stop(1);
         System.out.println("HTTP-сервер завершен!");
 
     }
 
-    public  void setUp() throws ManagerSaveException {
+    public void setUp() throws ManagerSaveException {
         Task task1 = new Task("Задача 1", "Описание задачи 1", Status.NEW, Duration.ofMinutes(30), null);
         Task task2 = new Task("Задача 2", "Описание задачи 2", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024, 3, 26, 11, 0));
         Task task3 = new Task("Задача 3", "Описание задачи 3", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024, 3, 28, 12, 0));

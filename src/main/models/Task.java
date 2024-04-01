@@ -100,8 +100,8 @@ public class Task {
 
 
     public String toStringForFile() {
-        if (startTime !=  null)
-        {   DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        if (startTime != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
             return String.format("%d,TASK,%s,%s,%s,%d,%s", id, title, status, description, duration, startTime.format(formatter));
         }
         return String.format("%d,TASK,%s,%s,%s,%d,%s", id, title, status, description, duration, null);
