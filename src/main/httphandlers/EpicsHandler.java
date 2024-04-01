@@ -30,7 +30,7 @@ public class EpicsHandler implements HttpHandler {
 
     // метод для разбора строки из параметров на пары ключ и значение в HashMap
     public Map<String, String> queryToMap(String query) {
-        if(query == null) {
+        if (query == null) {
             return null;
         }
         Map<String, String> result = new HashMap<>();
@@ -38,12 +38,13 @@ public class EpicsHandler implements HttpHandler {
             String[] entry = param.split("=");
             if (entry.length > 1) {
                 result.put(entry[0], entry[1]);
-            }else{
+            } else {
                 result.put(entry[0], "");
             }
         }
         return result;
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
@@ -95,6 +96,7 @@ public class EpicsHandler implements HttpHandler {
         writeResponse(exchange, response, 200);
 
     }
+
     // обработчик запроса на получение одной задачи
     private void handleGetEpic(HttpExchange exchange) throws IOException {
         String[] pathParts = exchange.getRequestURI().getPath().split("/");
@@ -127,12 +129,13 @@ public class EpicsHandler implements HttpHandler {
             writeResponse(exchange, "Not Found", 404);
         }
     }
+
     // обработчик запроса на добавление одной задачи
     private void handleAddEpic(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         System.out.println(body);
         JsonElement jsonElement = JsonParser.parseString(body);
-        if(!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
+        if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
             writeResponse(exchange, "Not Acceptable", 406);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
@@ -144,18 +147,15 @@ public class EpicsHandler implements HttpHandler {
             System.out.println("Эпик " + epic.toString());
             taskManager.addEpic(epic);
             writeResponse(exchange, "Added", 201);
-        }
-        catch (ManagerSaveException ex)
-        {
+        } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Acceptable", 406);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
 
     }
+
     // обработчик запроса на удаление одной задачи
     private void handleDeleteEpic(HttpExchange exchange) throws IOException {
         Map<String, String> params = queryToMap(exchange.getRequestURI().getQuery());
@@ -163,9 +163,7 @@ public class EpicsHandler implements HttpHandler {
         try {
             taskManager.deleteEpic(id);
             writeResponse(exchange, "Deleted", 201);
-        }
-        catch (ManagerSaveException ex)
-        {
+        } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Found", 404);
         }
@@ -181,9 +179,7 @@ public class EpicsHandler implements HttpHandler {
         return gsonBuilder.create();
     }
 
-    private void writeResponse(HttpExchange exchange,
-                               String responseString,
-                               int responseCode) throws IOException {
+    private void writeResponse(HttpExchange exchange, String responseString, int responseCode) throws IOException {
         try (OutputStream os = exchange.getResponseBody()) {
             exchange.sendResponseHeaders(responseCode, 0);
             os.write(responseString.getBytes(DEFAULT_CHARSET));
@@ -198,22 +194,17 @@ public class EpicsHandler implements HttpHandler {
         switch (requestMethod) {
             case "GET": {
                 // вернуть json задач
-                if (Pattern.matches("^/epics$", requestURI))
-                    return Endpoint.GET_COLLECTION;
-                if (Pattern.matches("^/epics/\\d+$", requestURI))
-                    return Endpoint.GET_ONE;
-                if (Pattern.matches("^/epics/\\d+/subtasks$", requestURI))
-                    return Endpoint.GET_EPIC_SUBTASKS;
+                if (Pattern.matches("^/epics$", requestURI)) return Endpoint.GET_COLLECTION;
+                if (Pattern.matches("^/epics/\\d+$", requestURI)) return Endpoint.GET_ONE;
+                if (Pattern.matches("^/epics/\\d+/subtasks$", requestURI)) return Endpoint.GET_EPIC_SUBTASKS;
                 return Endpoint.UNKNOWN;
             }
             case "POST": {
-                if (Pattern.matches("^/epics$", requestURI))
-                    return Endpoint.ADD;
+                if (Pattern.matches("^/epics$", requestURI)) return Endpoint.ADD;
                 return Endpoint.UNKNOWN;
             }
             case "DELETE": {
-                if (Pattern.matches("^/epics\\?id=\\d+$", requestURI))
-                    return Endpoint.DELETE;
+                if (Pattern.matches("^/epics\\?id=\\d+$", requestURI)) return Endpoint.DELETE;
                 return Endpoint.UNKNOWN;
             }
             default:
