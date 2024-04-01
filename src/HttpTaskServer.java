@@ -1,10 +1,7 @@
 import com.sun.net.httpserver.HttpServer;
 import main.Managers;
 import main.TaskManager;
-import main.httphandlers.EpicsHandler;
-import main.httphandlers.HistoryHandler;
-import main.httphandlers.SubtasksHandler;
-import main.httphandlers.TasksHandler;
+import main.httphandlers.*;
 import main.models.*;
 
 import java.io.IOException;
@@ -26,6 +23,7 @@ public class HttpTaskServer {
         httpServer.createContext("/subtasks", new SubtasksHandler(taskManager));
         httpServer.createContext("/epics", new EpicsHandler(taskManager));
         httpServer.createContext("/history", new HistoryHandler(taskManager));
+        httpServer.createContext("/prioritized", new PriorityHandler(taskManager));
         httpServer.start(); // запускаем сервер
 
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
