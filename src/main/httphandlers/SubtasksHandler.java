@@ -1,14 +1,12 @@
 package main.httphandlers;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import main.TaskManager;
 import main.models.ManagerSaveException;
 import main.models.Subtask;
-import main.models.Task;
-import com.sun.net.httpserver.Headers;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,7 +14,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -30,7 +27,7 @@ public class SubtasksHandler implements HttpHandler {
 
     // метод для разбора строки из параметров на пары ключ и значение в HashMap
     public Map<String, String> queryToMap(String query) {
-        if(query == null) {
+        if (query == null) {
             return null;
         }
         Map<String, String> result = new HashMap<>();
@@ -38,12 +35,13 @@ public class SubtasksHandler implements HttpHandler {
             String[] entry = param.split("=");
             if (entry.length > 1) {
                 result.put(entry[0], entry[1]);
-            }else{
+            } else {
                 result.put(entry[0], "");
             }
         }
         return result;
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
@@ -95,6 +93,7 @@ public class SubtasksHandler implements HttpHandler {
         writeResponse(exchange, response, 200);
 
     }
+
     // обработчик запроса на получение одной задачи
     private void handleGetSubtask(HttpExchange exchange) throws IOException {
         String[] pathParts = exchange.getRequestURI().getPath().split("/");
@@ -110,12 +109,13 @@ public class SubtasksHandler implements HttpHandler {
             writeResponse(exchange, "Not Found", 404);
         }
     }
+
     // обработчик запроса на добавление одной задачи
     private void handleAddSubtask(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         System.out.println(body);
         JsonElement jsonElement = JsonParser.parseString(body);
-        if(!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
+        if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
             writeResponse(exchange, "Not Acceptable", 406);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
@@ -125,18 +125,15 @@ public class SubtasksHandler implements HttpHandler {
         try {
             taskManager.addSubtask(subtask);
             writeResponse(exchange, "Added", 201);
-        }
-        catch (ManagerSaveException ex)
-        {
+        } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Acceptable", 406);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
 
     }
+
     // обработчик запроса на удаление одной задачи
     private void handleDeleteSubtask(HttpExchange exchange) throws IOException {
         Map<String, String> params = queryToMap(exchange.getRequestURI().getQuery());
@@ -144,19 +141,18 @@ public class SubtasksHandler implements HttpHandler {
         try {
             taskManager.deleteSubtask(id);
             writeResponse(exchange, "Deleted", 201);
-        }
-        catch (ManagerSaveException ex)
-        {
+        } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Found", 404);
         }
 
     }
+
     // обработчик запроса на обновление одной задачи
     private void handleUpdateSubtask(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonElement jsonElement = JsonParser.parseString(body);
-        if(!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
+        if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
             writeResponse(exchange, "Not Acceptable", 406);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
@@ -166,13 +162,12 @@ public class SubtasksHandler implements HttpHandler {
         try {
             taskManager.updateSubtask(subtask);
             writeResponse(exchange, "Updated", 201);
-        }
-        catch (ManagerSaveException ex)
-        {
+        } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Acceptable", 406);
         }
     }
+
     // Настройка json
     private Gson getDefaultGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -181,9 +176,7 @@ public class SubtasksHandler implements HttpHandler {
         return gsonBuilder.create();
     }
 
-    private void writeResponse(HttpExchange exchange,
-                               String responseString,
-                               int responseCode) throws IOException {
+    private void writeResponse(HttpExchange exchange, String responseString, int responseCode) throws IOException {
         try (OutputStream os = exchange.getResponseBody()) {
             exchange.sendResponseHeaders(responseCode, 0);
             os.write(responseString.getBytes(DEFAULT_CHARSET));
@@ -192,28 +185,21 @@ public class SubtasksHandler implements HttpHandler {
     }
 
     private Endpoint getEndpoint(String requestURI, String requestMethod) {
-//        String[] pathParts = requestPath.split("/");
-//        System.out.println(requestPath+" "+requestMethod +" " +requestParams);
         // анализируем какой метод TaskManagera нужен
         switch (requestMethod) {
             case "GET": {
                 // вернуть json задач
-                if (Pattern.matches("^/subtasks$", requestURI))
-                    return Endpoint.GET_COLLECTION;
-                if (Pattern.matches("^/subtasks/\\d+$", requestURI))
-                    return Endpoint.GET_ONE;
+                if (Pattern.matches("^/subtasks$", requestURI)) return Endpoint.GET_COLLECTION;
+                if (Pattern.matches("^/subtasks/\\d+$", requestURI)) return Endpoint.GET_ONE;
                 return Endpoint.UNKNOWN;
             }
             case "POST": {
-                if (Pattern.matches("^/subtasks$", requestURI))
-                    return Endpoint.ADD;
-                if (Pattern.matches("^/subtasks\\?id=\\d+$", requestURI))
-                    return Endpoint.UPDATE;
+                if (Pattern.matches("^/subtasks$", requestURI)) return Endpoint.ADD;
+                if (Pattern.matches("^/subtasks\\?id=\\d+$", requestURI)) return Endpoint.UPDATE;
                 return Endpoint.UNKNOWN;
             }
             case "DELETE": {
-                if (Pattern.matches("^/subtasks\\?id=\\d+$", requestURI))
-                    return Endpoint.DELETE;
+                if (Pattern.matches("^/subtasks\\?id=\\d+$", requestURI)) return Endpoint.DELETE;
                 return Endpoint.UNKNOWN;
             }
             default:
@@ -225,6 +211,5 @@ public class SubtasksHandler implements HttpHandler {
     }
 }
 
-class SubTaskListTypeToken extends TypeToken<List<Task>> {
-}
+
 
