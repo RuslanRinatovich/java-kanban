@@ -28,21 +28,18 @@ class UserListTypeToken extends TypeToken<List<Task>> {
     // здесь ничего не нужно реализовывать
 }
 
-
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class HttpTaskServerTest {
-
-
+    HttpTaskServer httpTaskServer;
     @BeforeEach
     public void setUp() throws IOException {
-        HttpTaskServer httpTaskServer = new HttpTaskServer();
-        HttpTaskServer.setUp();
-        HttpTaskServer.createServer();
-        HttpTaskServer.start();
+        httpTaskServer = new HttpTaskServer();
+        httpTaskServer.main();
     }
 
     @AfterEach
-    public void destroy() throws IOException {
-        HttpTaskServer.stop();
+    public void destroy()  {
+        httpTaskServer.stop();
     }
 
     private Gson getDefaultGson() {
@@ -56,6 +53,7 @@ public class HttpTaskServerTest {
 
     @Test
     void AddTasksReturnCode200() throws IOException, InterruptedException {
+
         URI uri = URI.create("http://localhost:8080/tasks");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri).header("Content-Type", "application/json;charset=UTF-8")
@@ -72,9 +70,10 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 201;
         int actualResponseCode = response.statusCode();
-        List<Task> taskList = HttpTaskServer.taskManager.getTasks();
+        List<Task> taskList = httpTaskServer.taskManager.getTasks();
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(4, taskList.size(), "Не верное количество задач");
+
     }
 
     @Test
@@ -117,7 +116,7 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 201;
         int actualResponseCode = response.statusCode();
-        List<Task> taskList = HttpTaskServer.taskManager.getTasks();
+        List<Task> taskList = httpTaskServer.taskManager.getTasks();
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(3, taskList.size(), "Не верное количество задач");
     }

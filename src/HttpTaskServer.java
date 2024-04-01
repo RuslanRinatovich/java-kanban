@@ -1,3 +1,4 @@
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import main.Managers;
 import main.TaskManager;
@@ -10,19 +11,17 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HttpTaskServer {
 
     private static final int PORT = 8080;
-    public static TaskManager taskManager = Managers.getDefault();
-    private static HttpServer httpServer;
+    public TaskManager taskManager = Managers.getDefault();
+    private HttpServer httpServer;
 
-    public HttpTaskServer() {
-
-
-    }
-
-    public static void main(String[] args) throws IOException {
+    public void main() throws IOException {
         // инициализация начальных данных
         setUp();
         createServer();
@@ -32,7 +31,7 @@ public class HttpTaskServer {
         // httpServer.stop(1);
     }
 
-    public static void createServer() throws IOException {
+    public  void createServer() throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TasksHandler(taskManager));
         httpServer.createContext("/subtasks", new SubtasksHandler(taskManager));
@@ -41,15 +40,18 @@ public class HttpTaskServer {
         httpServer.createContext("/prioritized", new PriorityHandler(taskManager));
     }
 
-    public static void start() {
+    public  void start() {
+
         httpServer.start();
     }
 
-    public static void stop() {
+    public  void stop() {
         httpServer.stop(1);
+        System.out.println("HTTP-сервер завершен!");
+
     }
 
-    public static void setUp() throws ManagerSaveException {
+    public  void setUp() throws ManagerSaveException {
         Task task1 = new Task("Задача 1", "Описание задачи 1", Status.NEW, Duration.ofMinutes(30), null);
         Task task2 = new Task("Задача 2", "Описание задачи 2", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024, 3, 26, 11, 0));
         Task task3 = new Task("Задача 3", "Описание задачи 3", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024, 3, 28, 12, 0));
