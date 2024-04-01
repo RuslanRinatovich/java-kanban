@@ -3,10 +3,16 @@ package main;
 
 import main.models.*;
 
+import java.io.FileInputStream;
 import java.time.Duration;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
+    static Logger LOGGER;
     protected final HistoryManager historyManager;
     protected final Map<Integer, Task> taskHashMap = new HashMap<>();
     protected final Map<Integer, Epic> epicHashMap = new HashMap<>();
@@ -18,6 +24,14 @@ public class InMemoryTaskManager implements TaskManager {
         this.historyManager = historyManager;
     }
 
+    static {
+        try(FileInputStream ins = new FileInputStream("log.config")){
+            LogManager.getLogManager().readConfiguration(ins);
+            LOGGER = Logger.getLogger(Main.class.getName());
+        }catch (Exception ignore){
+            ignore.printStackTrace();
+        }
+    }
     @Override
     public Map<Integer, Task> getTaskHashMap() {
         return taskHashMap;
@@ -52,9 +66,27 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void checkIfIntersectedTaskExist(Task currentTask) throws ManagerSaveException {
-        Optional<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(currentTask, task)).findFirst();
-        if (intersectedTask.isPresent()) {
-            throw new ManagerSaveException("Пересечение задач", new Exception());
+        List<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(currentTask, task)).collect(Collectors.toList());
+        if (!intersectedTask.isEmpty())
+        {
+            if (intersectedTask.size() > 1)
+            {
+                LOGGER.log(Level.INFO, currentTask.toString());
+                for (Task t: intersectedTask ) {
+                    LOGGER.log(Level.INFO, t.toString());
+                }
+                LOGGER.log(Level.WARNING , "Пересечение при добавлении");
+               throw new ManagerSaveException("Пересечение при добавлении", new Exception());
+            }
+            if (!intersectedTask.contains(currentTask))
+            {
+                LOGGER.log(Level.INFO, currentTask.toString());
+                for (Task t: intersectedTask ) {
+                    LOGGER.log(Level.INFO, t.toString());
+                }
+                LOGGER.log(Level.WARNING , "Пересечение при обновлении");
+                throw new ManagerSaveException("Пересечение при обновлении", new Exception());
+            }
         }
     }
 
@@ -104,6 +136,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (id == 0) {
             id = getNewId();
             newTask.setId(id);
+        }
+        if (taskHashMap.containsKey(id))
+        {
+            throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
         }
         checkIfIntersectedTaskExist(newTask);
         taskHashMap.put(id, newTask);

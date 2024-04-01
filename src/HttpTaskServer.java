@@ -28,8 +28,6 @@ public class HttpTaskServer {
     }
 
    static void setUp() throws ManagerSaveException {
-
-
         Task task1 = new Task("Задача 1", "Описание задачи 1",  Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,25,10,0));
         Task task2 = new Task("Задача 2", "Описание задачи 2", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,26,11,0));
         Task task3 = new Task("Задача 3", "Описание задачи 3",  Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,28,12,0));

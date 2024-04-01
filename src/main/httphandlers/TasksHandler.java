@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class TasksHandler implements HttpHandler {
@@ -31,7 +32,7 @@ public class TasksHandler implements HttpHandler {
         this.taskManager = taskManager;
     }
 
-
+    // метод для разбора строки из параметров на пары ключ и значение в HashMap
     public Map<String, String> queryToMap(String query) {
         if(query == null) {
             return null;
@@ -49,10 +50,9 @@ public class TasksHandler implements HttpHandler {
     }
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        //String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        //System.out.println(body);
-        Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(),
-                exchange.getRequestURI().getQuery(), exchange.getRequestMethod());
+
+        System.out.println(exchange.getRequestURI());
+        Endpoint endpoint = getEndpoint(String.valueOf(exchange.getRequestURI()), exchange.getRequestMethod());
         System.out.println(endpoint.toString());
 
         switch (endpoint) {
@@ -68,7 +68,6 @@ public class TasksHandler implements HttpHandler {
             }
             case ADD: {
                 System.out.println("try add task");
-
                 handleAddTask(exchange);
                 break;
             }
@@ -81,7 +80,6 @@ public class TasksHandler implements HttpHandler {
                 System.out.println("try update task");
                 handleUpdateTask(exchange);
                 break;
-
             }
             case UNKNOWN: {
                 writeResponse(exchange, "Такого эндпоинта не существует", 404);
@@ -92,25 +90,20 @@ public class TasksHandler implements HttpHandler {
         }
     }
 
+    // обработчик запроса на получение всех задач
     private void handleGetTasks(HttpExchange exchange) throws IOException {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setPrettyPrinting();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalTimeTypeAdapter());
-        Gson gson = gsonBuilder.create();
+        Gson gson = getDefaultGson();
         Headers headers = exchange.getResponseHeaders();
         headers.set("Content-Type", "application/json;charset=UTF-8");
         String response = gson.toJson(taskManager.getTasks());
         writeResponse(exchange, response, 200);
 
     }
-
+    // обработчик запроса на получение одной задачи
     private void handleGetTask(HttpExchange exchange) throws IOException {
         String[] pathParts = exchange.getRequestURI().getPath().split("/");
         int taskId = Integer.parseInt(pathParts[2]);
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setPrettyPrinting();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalTimeTypeAdapter());
-        Gson gson = gsonBuilder.create();
+        Gson gson = getDefaultGson();
         Headers headers = exchange.getResponseHeaders();
         headers.set("Content-Type", "application/json;charset=UTF-8");
         Task task = taskManager.getTask(taskId);
@@ -121,7 +114,7 @@ public class TasksHandler implements HttpHandler {
             writeResponse(exchange, "Not Found", 404);
         }
     }
-
+    // обработчик запроса на добавление одной задачи
     private void handleAddTask(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         System.out.println(body);
@@ -130,11 +123,7 @@ public class TasksHandler implements HttpHandler {
             writeResponse(exchange, "Not Acceptable", 406);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setPrettyPrinting();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalTimeTypeAdapter());
-        Gson gson = gsonBuilder.create();
-
+        Gson gson = getDefaultGson();
         Task task = gson.fromJson(jsonObject, Task.class);
         try {
             taskManager.addTask(task);
@@ -142,11 +131,12 @@ public class TasksHandler implements HttpHandler {
         }
         catch (ManagerSaveException ex)
         {
+            System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Acceptable", 406);
         }
 
     }
-
+    // обработчик запроса на удаление одной задачи
     private void handleDeleteTask(HttpExchange exchange) throws IOException {
         Map<String, String> params = queryToMap(exchange.getRequestURI().getQuery());
         int id = Integer.parseInt(params.get("id"));
@@ -156,11 +146,12 @@ public class TasksHandler implements HttpHandler {
         }
         catch (ManagerSaveException ex)
         {
+            System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Found", 404);
         }
 
     }
-
+    // обработчик запроса на обновление одной задачи
     private void handleUpdateTask(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonElement jsonElement = JsonParser.parseString(body);
@@ -168,7 +159,7 @@ public class TasksHandler implements HttpHandler {
             writeResponse(exchange, "Not Acceptable", 406);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        Gson gson = new Gson();
+        Gson gson = getDefaultGson();
         Task task = gson.fromJson(jsonObject, Task.class);
         try {
             taskManager.updateTask(task);
@@ -176,16 +167,16 @@ public class TasksHandler implements HttpHandler {
         }
         catch (ManagerSaveException ex)
         {
+            System.out.println(ex.getMessage());
             writeResponse(exchange, "Not Acceptable", 406);
         }
     }
-
-    private String TaskToJson(Task task) {
+    // Настройка json
+    private Gson getDefaultGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
-        gsonBuilder.registerTypeAdapter(LocalTime.class, new LocalTimeTypeAdapter());
-        Gson gson = gsonBuilder.create();
-        return gson.toJson(task);
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalTimeTypeAdapter());
+        return gsonBuilder.create();
     }
 
     private void writeResponse(HttpExchange exchange,
@@ -198,38 +189,29 @@ public class TasksHandler implements HttpHandler {
         exchange.close();
     }
 
-    private Endpoint getEndpoint(String requestPath, String requestParams, String requestMethod) {
-        String[] pathParts = requestPath.split("/");
+    private Endpoint getEndpoint(String requestURI, String requestMethod) {
+//        String[] pathParts = requestPath.split("/");
+//        System.out.println(requestPath+" "+requestMethod +" " +requestParams);
         // анализируем какой метод TaskManagera нужен
         switch (requestMethod) {
             case "GET": {
                 // вернуть json задач
-                if (pathParts.length == 2)
+                if (Pattern.matches("^/tasks$", requestURI))
                     return Endpoint.GET_COLLECTION;
-                if (pathParts.length == 3) {
-                    try {
-                        Integer.parseInt(pathParts[2]);
-                    } catch (NumberFormatException e) {
-                        return Endpoint.UNKNOWN;
-                    }
-                    // вернуть одну задачу
-                    return Endpoint.GET_ONE;
-                }
+                if (Pattern.matches("^/tasks/\\d+$", requestURI))
+                     return Endpoint.GET_ONE;
                 return Endpoint.UNKNOWN;
             }
             case "POST": {
-                if (pathParts.length == 2)
+                if (Pattern.matches("^/tasks$", requestURI))
                     return Endpoint.ADD;
-                Map<String, String> params = queryToMap(requestParams);
-                if (params.containsKey("id"))
+                if (Pattern.matches("^/tasks\\?id=\\d+$", requestURI))
                     return Endpoint.UPDATE;
                 return Endpoint.UNKNOWN;
             }
             case "DELETE": {
-                Map<String, String> params = queryToMap(requestParams);
-                if (pathParts.length == 2 && params.containsKey("id") ){
+                if (Pattern.matches("^/tasks\\?id=\\d+$", requestURI))
                     return Endpoint.DELETE;
-                }
                 return Endpoint.UNKNOWN;
             }
             default:
