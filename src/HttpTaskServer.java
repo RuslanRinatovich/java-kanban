@@ -2,6 +2,7 @@ import com.sun.net.httpserver.HttpServer;
 import main.Managers;
 import main.TaskManager;
 import main.httphandlers.EpicsHandler;
+import main.httphandlers.HistoryHandler;
 import main.httphandlers.SubtasksHandler;
 import main.httphandlers.TasksHandler;
 import main.models.*;
@@ -24,6 +25,7 @@ public class HttpTaskServer {
         httpServer.createContext("/tasks", new TasksHandler(taskManager));
         httpServer.createContext("/subtasks", new SubtasksHandler(taskManager));
         httpServer.createContext("/epics", new EpicsHandler(taskManager));
+        httpServer.createContext("/history", new HistoryHandler(taskManager));
         httpServer.start(); // запускаем сервер
 
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
@@ -63,6 +65,13 @@ public class HttpTaskServer {
         taskManager.addSubtask(subtask6);//12
        Epic epic4 = new Epic("Эпик 4", "Описание Эпика 4",  Status.NEW, Duration.ofMinutes(0), null, new ArrayList<>());
        taskManager.addEpic(epic4);//13
+       taskManager.getTask(1);
+       taskManager.getTask(1);
+       taskManager.getTask(2);
+       taskManager.getSubtask(7);
+       taskManager.getSubtask(8);
+       taskManager.getEpic(4);
+       taskManager.getEpic(5);
 
     }
 }
