@@ -69,6 +69,7 @@ public class InMemoryTaskManager implements TaskManager {
         List<Task> intersectedTask = prioritizedTasks.stream().filter(task -> isTasksIntersected(currentTask, task)).collect(Collectors.toList());
         if (!intersectedTask.isEmpty())
         {
+
             if (intersectedTask.size() > 1)
             {
                 LOGGER.log(Level.INFO, currentTask.toString());
@@ -78,7 +79,10 @@ public class InMemoryTaskManager implements TaskManager {
                 LOGGER.log(Level.WARNING , "Пересечение при добавлении");
                throw new ManagerSaveException("Пересечение при добавлении", new Exception());
             }
-            if (!intersectedTask.contains(currentTask))
+            // если вы выборке только одна задача
+            // случай пересечения с самим собой при обновлении
+            int id = intersectedTask.get(0).getId();
+            if (id != currentTask.getId())
             {
                 LOGGER.log(Level.INFO, currentTask.toString());
                 for (Task t: intersectedTask ) {
@@ -90,6 +94,11 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    // проверяет существует ли указанный айди среди айди всех задач, подзадач и эпиков
+    private boolean IsCurrentIdExist(int id)
+    {
+        return (taskHashMap.containsKey(id) || subtaskHashMap.containsKey(id) || epicHashMap.containsKey(id));
+    }
     // -----------------------------------------------------------
     // Методы для работы с задачами
     public int getId() {
@@ -137,7 +146,7 @@ public class InMemoryTaskManager implements TaskManager {
             id = getNewId();
             newTask.setId(id);
         }
-        if (taskHashMap.containsKey(id))
+        if (IsCurrentIdExist(id))
         {
             throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
         }
@@ -223,7 +232,10 @@ public class InMemoryTaskManager implements TaskManager {
             newSubtask.setId(id);
         }
         checkIfIntersectedTaskExist(newSubtask);
-
+        if (IsCurrentIdExist(id))
+        {
+            throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
+        }
         subtaskHashMap.put(id, newSubtask);
         if (newSubtask.getStartTime() != null) prioritizedTasks.add(newSubtask);
 
@@ -260,6 +272,10 @@ public class InMemoryTaskManager implements TaskManager {
             subtaskHashMap.remove(id);
             updateEpicStatus(epic);
             updateEpicDurationAndTime(epic);
+        }
+        else
+        {
+            throw new ManagerSaveException("Указанного id не существует", new Exception());
         }
     }
 
@@ -319,6 +335,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (id == 0) {
             id = getNewId();
             newEpic.setId(id);
+        }
+        if (IsCurrentIdExist(id))
+        {
+            throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
         }
         epicHashMap.put(id, newEpic);
     }

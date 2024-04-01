@@ -1,6 +1,7 @@
 import com.sun.net.httpserver.HttpServer;
 import main.Managers;
 import main.TaskManager;
+import main.httphandlers.SubtasksHandler;
 import main.httphandlers.TasksHandler;
 import main.models.*;
 
@@ -20,6 +21,7 @@ public class HttpTaskServer {
         setUp();
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TasksHandler(taskManager));
+        httpServer.createContext("/subtasks", new SubtasksHandler(taskManager));
         httpServer.start(); // запускаем сервер
 
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
