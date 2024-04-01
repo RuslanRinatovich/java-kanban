@@ -91,7 +91,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // проверяет существует ли указанный айди среди айди всех задач, подзадач и эпиков
-    private boolean IsCurrentIdExist(int id) {
+    private boolean isCurrentIdExist(int id) {
         return (taskHashMap.containsKey(id) || subtaskHashMap.containsKey(id) || epicHashMap.containsKey(id));
     }
 
@@ -142,7 +142,7 @@ public class InMemoryTaskManager implements TaskManager {
             id = getNewId();
             newTask.setId(id);
         }
-        if (IsCurrentIdExist(id)) {
+        if (isCurrentIdExist(id)) {
             throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
         }
         if (newTask.getStartTime() != null) {
@@ -227,7 +227,7 @@ public class InMemoryTaskManager implements TaskManager {
             newSubtask.setId(id);
         }
         checkIfIntersectedTaskExist(newSubtask);
-        if (IsCurrentIdExist(id)) {
+        if (isCurrentIdExist(id)) {
             throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
         }
         subtaskHashMap.put(id, newSubtask);
@@ -328,7 +328,7 @@ public class InMemoryTaskManager implements TaskManager {
             id = getNewId();
             newEpic.setId(id);
         }
-        if (IsCurrentIdExist(id)) {
+        if (isCurrentIdExist(id)) {
             throw new ManagerSaveException("Задача с указанным id уже существует", new Exception());
         }
         epicHashMap.put(id, newEpic);
