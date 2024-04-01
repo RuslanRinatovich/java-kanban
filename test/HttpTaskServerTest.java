@@ -14,16 +14,14 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-class UserListTypeToken extends TypeToken<List<Task>> {
-    // здесь ничего не нужно реализовывать
-}
 
 
 public class HttpTaskServerTest {
     HttpTaskServer httpTaskServer;
+
     @BeforeEach
     public void setUp() throws IOException {
         httpTaskServer = new HttpTaskServer();
@@ -31,7 +29,7 @@ public class HttpTaskServerTest {
     }
 
     @AfterEach
-    public void destroy()  {
+    public void destroy() {
         httpTaskServer.stop();
     }
 
@@ -127,10 +125,11 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 200;
         int actualResponseCode = response.statusCode();
-        List<Task> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
+        List<Task> taskList = getDefaultGson().fromJson(response.body(), new TaskListTypeToken().getType());
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(3, taskList.size(), "Не верное количество задач");
     }
+
     // получение одной задачи с id 1
     @Test
     void CheckGetTasksWithId1ReturnCode200AndActualTask() throws IOException, InterruptedException {
@@ -144,7 +143,7 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 200;
         int actualResponseCode = response.statusCode();
-        Task expected = new Task(1,"Задача 1", "Описание задачи 1", Status.NEW, Duration.ofMinutes(30), null);
+        Task expected = new Task(1, "Задача 1", "Описание задачи 1", Status.NEW, Duration.ofMinutes(30), null);
         Task actual = getDefaultGson().fromJson(response.body(), Task.class);
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(expected, actual, "Задачи не совпали");
@@ -165,6 +164,7 @@ public class HttpTaskServerTest {
         int actualResponseCode = response.statusCode();
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
     }
+
     // получение всех подзадач
     @Test
     void CheckGetSubtasksReturnCode200AndSubtasksCountEqualToSix() throws IOException, InterruptedException {
@@ -178,10 +178,11 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 200;
         int actualResponseCode = response.statusCode();
-        List<Subtask> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
+        List<Subtask> taskList = getDefaultGson().fromJson(response.body(), new TaskListTypeToken().getType());
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(6, taskList.size(), "Не верное количество задач");
     }
+
     // получение одной подзадачи с id 7
     @Test
     void CheckGetSubtasksWithId7ReturnCode200AndActualTask() throws IOException, InterruptedException {
@@ -195,11 +196,12 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 200;
         int actualResponseCode = response.statusCode();
-        Subtask expected = new Subtask(7,"Подзадача 1", "Описание подзадачи 1",  Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024,3,28,13,0),4);
+        Subtask expected = new Subtask(7, "Подзадача 1", "Описание подзадачи 1", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024, 3, 28, 13, 0), 4);
         Subtask actual = getDefaultGson().fromJson(response.body(), Subtask.class);
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(expected, actual, "Задачи не совпали");
     }
+
     // получение одной подзадачи с неправильным id 100
     @Test
     void CheckGetSubTasksWithNonExistId100ReturnCode404() throws IOException, InterruptedException {
@@ -229,10 +231,11 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 200;
         int actualResponseCode = response.statusCode();
-        List<Epic> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
+        List<Epic> taskList = getDefaultGson().fromJson(response.body(), new TaskListTypeToken().getType());
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(4, taskList.size(), "Не верное количество задач");
     }
+
     // получение одного эпика с id 13
     @Test
     void CheckGetEpicWithId13ReturnCode200AndActualTask() throws IOException, InterruptedException {
@@ -246,7 +249,7 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 200;
         int actualResponseCode = response.statusCode();
-        Epic expected = new Epic(13,"Эпик 4", "Описание Эпика 4",  Status.NEW, Duration.ofMinutes(0), null, new ArrayList<>());
+        Epic expected = new Epic(13, "Эпик 4", "Описание Эпика 4", Status.NEW, Duration.ofMinutes(0), null, new ArrayList<>());
         Epic actual = getDefaultGson().fromJson(response.body(), Epic.class);
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(expected, actual, "Задачи не совпали");
@@ -296,7 +299,7 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 200;
         int actualResponseCode = response.statusCode();
-        List<Task> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
+        List<Task> taskList = getDefaultGson().fromJson(response.body(), new TaskListTypeToken().getType());
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(6, taskList.size(), "Не верное количество задач");
     }
@@ -313,11 +316,12 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 200;
         int actualResponseCode = response.statusCode();
-        List<Task> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
-        Task expected = new Task(2,"Задача 2", "Описание задачи 2", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024, 3, 26, 11, 0));
+        List<Task> taskList = getDefaultGson().fromJson(response.body(), new TaskListTypeToken().getType());
+        Task expected = new Task(2, "Задача 2", "Описание задачи 2", Status.NEW, Duration.ofMinutes(30), LocalDateTime.of(2024, 3, 26, 11, 0));
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
         assertEquals(expected, taskList.get(0), "Разные задачи");
     }
+
     @Test
     void CheckGetPriorityLastTaskHasId12() throws IOException, InterruptedException {
         URI uri = URI.create("http://localhost:8080/prioritized");
@@ -330,11 +334,17 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int expectedResponseCode = 200;
         int actualResponseCode = response.statusCode();
-        List<Task> taskList = getDefaultGson().fromJson(response.body(), new UserListTypeToken().getType());
+        List<Task> taskTreeSet = getDefaultGson().fromJson(response.body(), new TaskListTypeToken().getType());
         int expected = 12;
         assertEquals(expectedResponseCode, actualResponseCode, "Коды не совпадают");
-        assertEquals(expected, taskList.get(7).getId(), "Разные задачи");
+        assertEquals(expected, taskTreeSet.get(7).getId(), "Разные задачи");
     }
 
 }
+
+
+class TaskListTypeToken extends TypeToken<List<Task>> {
+    // здесь ничего не нужно реализовывать
+}
+
 

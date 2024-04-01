@@ -119,7 +119,6 @@ public class TasksHandler implements HttpHandler {
     // обработчик запроса на добавление одной задачи
     private void handleAddTask(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        System.out.println(body);
         JsonElement jsonElement = JsonParser.parseString(body);
 
         if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
