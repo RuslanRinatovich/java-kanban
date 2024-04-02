@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
+import static java.net.HttpURLConnection.*;
 
 public class HistoryHandler implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
@@ -37,11 +38,11 @@ public class HistoryHandler implements HttpHandler {
                 break;
             }
             case UNKNOWN: {
-                writeResponse(exchange, "Not Found", 404);
+                writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
                 break;
             }
             default:
-                writeResponse(exchange, "Not Found", 404);
+                writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
         }
     }
 
@@ -51,7 +52,7 @@ public class HistoryHandler implements HttpHandler {
         Headers headers = exchange.getResponseHeaders();
         headers.set("Content-Type", "application/json;charset=UTF-8");
         String response = gson.toJson(taskManager.getHistory());
-        writeResponse(exchange, response, 200);
+        writeResponse(exchange, response, HTTP_OK);
 
     }
 

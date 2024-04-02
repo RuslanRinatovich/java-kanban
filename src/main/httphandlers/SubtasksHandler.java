@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import static java.net.HttpURLConnection.*;
 
 public class SubtasksHandler implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
@@ -76,11 +77,11 @@ public class SubtasksHandler implements HttpHandler {
                 break;
             }
             case UNKNOWN: {
-                writeResponse(exchange, "Not Found", 404);
+                writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
                 break;
             }
             default:
-                writeResponse(exchange, "Not Found", 404);
+                writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
         }
     }
 
@@ -90,7 +91,7 @@ public class SubtasksHandler implements HttpHandler {
         Headers headers = exchange.getResponseHeaders();
         headers.set("Content-Type", "application/json;charset=UTF-8");
         String response = gson.toJson(taskManager.getSubtasks());
-        writeResponse(exchange, response, 200);
+        writeResponse(exchange, response, HTTP_OK);
 
     }
 
@@ -104,9 +105,9 @@ public class SubtasksHandler implements HttpHandler {
         Subtask subtask = taskManager.getSubtask(subtaskId);
         if (subtask != null) {
             String response = gson.toJson(subtask);
-            writeResponse(exchange, response, 200);
+            writeResponse(exchange, response, HTTP_OK);
         } else {
-            writeResponse(exchange, "Not Found", 404);
+            writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
         }
     }
 
@@ -116,7 +117,7 @@ public class SubtasksHandler implements HttpHandler {
         System.out.println(body);
         JsonElement jsonElement = JsonParser.parseString(body);
         if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
-            writeResponse(exchange, "Not Acceptable", 406);
+            writeResponse(exchange, "Not Acceptable", HTTP_NOT_ACCEPTABLE);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         Gson gson = getDefaultGson();
@@ -124,10 +125,10 @@ public class SubtasksHandler implements HttpHandler {
         System.out.println("Подзадача" + subtask.toString());
         try {
             taskManager.addSubtask(subtask);
-            writeResponse(exchange, "Added", 201);
+            writeResponse(exchange, "Added", HTTP_CREATED);
         } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
-            writeResponse(exchange, "Not Acceptable", 406);
+            writeResponse(exchange, "Not Acceptable", HTTP_NOT_ACCEPTABLE);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -140,10 +141,10 @@ public class SubtasksHandler implements HttpHandler {
         int id = Integer.parseInt(params.get("id"));
         try {
             taskManager.deleteSubtask(id);
-            writeResponse(exchange, "Deleted", 201);
+            writeResponse(exchange, "Deleted", HTTP_CREATED);
         } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
-            writeResponse(exchange, "Not Found", 404);
+            writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
         }
 
     }
@@ -153,7 +154,7 @@ public class SubtasksHandler implements HttpHandler {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonElement jsonElement = JsonParser.parseString(body);
         if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
-            writeResponse(exchange, "Not Acceptable", 406);
+            writeResponse(exchange, "Not Acceptable", HTTP_NOT_ACCEPTABLE);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         Gson gson = getDefaultGson();
@@ -161,10 +162,10 @@ public class SubtasksHandler implements HttpHandler {
         System.out.println(subtask.toString());
         try {
             taskManager.updateSubtask(subtask);
-            writeResponse(exchange, "Updated", 201);
+            writeResponse(exchange, "Updated", HTTP_CREATED);
         } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
-            writeResponse(exchange, "Not Acceptable", 406);
+            writeResponse(exchange, "Not Acceptable", HTTP_NOT_ACCEPTABLE);
         }
     }
 

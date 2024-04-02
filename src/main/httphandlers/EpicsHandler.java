@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.net.HttpURLConnection.*;
+
 public class EpicsHandler implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final TaskManager taskManager;
@@ -79,11 +81,11 @@ public class EpicsHandler implements HttpHandler {
                 break;
             }
             case UNKNOWN: {
-                writeResponse(exchange, "Not Found", 404);
+                writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
                 break;
             }
             default:
-                writeResponse(exchange, "Not Found", 404);
+                writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
         }
     }
 
@@ -93,7 +95,7 @@ public class EpicsHandler implements HttpHandler {
         Headers headers = exchange.getResponseHeaders();
         headers.set("Content-Type", "application/json;charset=UTF-8");
         String response = gson.toJson(taskManager.getEpics());
-        writeResponse(exchange, response, 200);
+        writeResponse(exchange, response, HTTP_OK);
 
     }
 
@@ -107,9 +109,9 @@ public class EpicsHandler implements HttpHandler {
         Epic epic = taskManager.getEpic(epicId);
         if (epic != null) {
             String response = gson.toJson(epic);
-            writeResponse(exchange, response, 200);
+            writeResponse(exchange, response, HTTP_OK);
         } else {
-            writeResponse(exchange, "Not Found", 404);
+            writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
         }
     }
 
@@ -124,9 +126,9 @@ public class EpicsHandler implements HttpHandler {
         if (epic != null) {
             List<Subtask> subtasks = taskManager.getSubtasks().stream().filter(subtask -> epic.getSubtasksIds().contains(subtask.getId())).collect(Collectors.toList());
             String response = gson.toJson(subtasks);
-            writeResponse(exchange, response, 200);
+            writeResponse(exchange, response, HTTP_OK);
         } else {
-            writeResponse(exchange, "Not Found", 404);
+            writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
         }
     }
 
@@ -136,7 +138,7 @@ public class EpicsHandler implements HttpHandler {
         System.out.println(body);
         JsonElement jsonElement = JsonParser.parseString(body);
         if (!jsonElement.isJsonObject()) { // проверяем, точно ли мы получили JSON-объект
-            writeResponse(exchange, "Not Acceptable", 406);
+            writeResponse(exchange, "Not Acceptable", HTTP_NOT_ACCEPTABLE);
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         Gson gson = getDefaultGson();
@@ -146,10 +148,10 @@ public class EpicsHandler implements HttpHandler {
         try {
             System.out.println("Эпик " + epic.toString());
             taskManager.addEpic(epic);
-            writeResponse(exchange, "Added", 201);
+            writeResponse(exchange, "Added", HTTP_CREATED);
         } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
-            writeResponse(exchange, "Not Acceptable", 406);
+            writeResponse(exchange, "Not Acceptable", HTTP_NOT_ACCEPTABLE);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -162,10 +164,10 @@ public class EpicsHandler implements HttpHandler {
         int id = Integer.parseInt(params.get("id"));
         try {
             taskManager.deleteEpic(id);
-            writeResponse(exchange, "Deleted", 201);
+            writeResponse(exchange, "Deleted", HTTP_CREATED);
         } catch (ManagerSaveException ex) {
             System.out.println(ex.getMessage());
-            writeResponse(exchange, "Not Found", 404);
+            writeResponse(exchange, "Not Found", HTTP_NOT_FOUND);
         }
 
     }
