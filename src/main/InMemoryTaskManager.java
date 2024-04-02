@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
-    static Logger LOGGER;
+    private static Logger LOGGER;
 
     static {
         try (FileInputStream ins = new FileInputStream("log.config")) {

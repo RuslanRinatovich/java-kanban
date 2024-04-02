@@ -188,8 +188,6 @@ public class EpicsHandler implements HttpHandler {
     }
 
     private Endpoint getEndpoint(String requestURI, String requestMethod) {
-//        String[] pathParts = requestPath.split("/");
-//        System.out.println(requestPath+" "+requestMethod +" " +requestParams);
         // анализируем какой метод TaskManagera нужен
         switch (requestMethod) {
             case "GET": {
